@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+    <body class="bg-light">
+
+        <%- include('../../partials/header') %>
+
+            <div class="d-flex">
+
+                <%- include('../../partials/sidebar') %>
+
+                    <main class="content w-100">
+
+                        <div class="container-fluid px-4 py-4">
+
+                            <!-- CARD PRINCIPAL -->
+                            <div class="card border-0 shadow-sm">
+
+                                <div class="card-body p-4">
+
+                                    <!-- CABEÇALHO -->
+                                    <div class="page-header mb-4">
+
+                                        <div class="page-title">
+
+                                            <div>
+                                                <h1 class="text-danger fw-bold mb-1">
+                                                    <i class="bi bi-bus-front-fill me-2"></i>
+                                                    Veículos Cadastrados
+                                                </h1>
+
+                                                <p class="text-muted mb-0">
+                                                    Visualize e gerencie os veículos cadastrados no sistema.
+                                                </p>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="header-actions">
+
+                                            <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                <a href="/veiculo/cadastrar" class="btn btn-cadastrar">
+                                                    <i class="bi bi-plus-lg me-2"></i>
+                                                    Cadastrar Veículo
+                                                </a>
+
+                                                <% } %>
+
+                                                    <a href="/dashboard" class="btn btn-voltar">
+                                                        <i class="bi bi-arrow-left me-2"></i>
+                                                        Voltar
+                                                    </a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- LINHA SEPARADORA -->
+                                    <hr class="mb-4">
+
+                                    <!-- LISTA DE VEÍCULOS -->
+                                    <% if (veiculos && veiculos.length> 0) { %>
+
+                                        <div class="row g-4">
+
+                                            <% veiculos.forEach((veiculo, i)=> { %>
+
+                                                <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+
+                                                    <div class="veiculo-card">
+
+                                                        <!-- TOPO DO CARD -->
+                                                        <div class="veiculo-topo">
+
+                                                            <div class="veiculo-icon">
+                                                                <i class="bi bi-bus-front-fill"></i>
+                                                            </div>
+
+                                                            <div class="veiculo-identificacao">
+
+                                                                <span class="veiculo-label">
+                                                                    VEÍCULO
+                                                                </span>
+
+                                                                <h4>
+                                                                    <%= veiculo.numero_veiculo %>
+                                                                </h4>
+
+                                                            </div>
+
+                                                            <!-- STATUS -->
+                                                            <% if (veiculo.status_veiculo) { %>
+
+                                                                <span class="status ativo">
+                                                                    <i class="bi bi-check-circle-fill"></i>
+                                                                    Ativo
+                                                                </span>
+
+                                                                <% } else { %>
+
+                                                                    <span class="status inativo">
+                                                                        <i class="bi bi-x-circle-fill"></i>
+                                                                        Inativo
+                                                                    </span>
+
+                                                                    <% } %>
+
+                                                        </div>
+
+                                                        <!-- INFORMAÇÕES -->
+                                                        <div class="veiculo-info">
+
+                                                            <div class="info-item">
+
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-credit-card-2-front"></i>
+                                                                </div>
+
+                                                                <div>
+                                                                    <span>Placa</span>
+
+                                                                    <strong>
+                                                                        <%= veiculo.placa %>
+                                                                    </strong>
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div class="info-item">
+
+                                                                <div class="info-icon">
+                                                                    <i class="bi bi-people-fill"></i>
+                                                                </div>
+
+                                                                <div>
+                                                                    <span>Capacidade</span>
+
+                                                                    <strong>
+                                                                        <%= veiculo.capacidade_veiculo %>
+                                                                            passageiros
+                                                                    </strong>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                        <!-- AÇÕES -->
+                                                        <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                            <div class="veiculo-acoes">
+
+                                                                <a href="/veiculo/editar/<%= veiculo.id %>"
+                                                                    class="btn btn-editar">
+
+                                                                    <i class="bi bi-pencil me-1"></i>
+                                                                    Editar
+
+                                                                </a>
+
+                                                                <form class="form-excluir"
+                                                                    action="/veiculo/excluir/<%= veiculo.id %>"
+                                                                    method="POST">
+
+                                                                    <button type="submit" class="btn btn-excluir">
+
+                                                                        <i class="bi bi-trash me-1"></i>
+                                                                        Excluir
+
+                                                                    </button>
+
+                                                                </form>
+
+                                                            </div>
+
+                                                            <% } %>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <% }) %>
+
+                                        </div>
+
+                                        <% } else { %>
+
+                                            <!-- NENHUM VEÍCULO -->
+                                            <div class="empty-state">
+
+                                                <div class="empty-icon">
+                                                    <i class="bi bi-bus-front"></i>
+                                                </div>
+
+                                                <h4>
+                                                    Nenhum veículo cadastrado
+                                                </h4>
+
+                                                <p>
+                                                    Ainda não existem veículos cadastrados no sistema.
+                                                </p>
+
+                                                <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                    <a href="/veiculo/cadastrar" class="btn btn-cadastrar">
+                                                        <i class="bi bi-plus-lg me-2"></i>
+                                                        Cadastrar primeiro veículo
+                                                    </a>
+
+                                                    <% } %>
+
+                                            </div>
+
+                                            <% } %>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </main>
+
+            </div>
+
+            <%- include('../../partials/scripts') %>
+
+                <!-- SWEETALERT -->
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                <!-- EXCLUSÃO -->
+                <script>
+
+                    const formsExcluir =
+                        document.getElementsByClassName('form-excluir');
+
+                    for (const formExcluir of formsExcluir) {
+
+                        formExcluir.addEventListener('submit', (e) => {
+
+                            e.preventDefault();
+
+                            Swal.fire({
+
+                                title: 'Deseja realmente excluir?',
+                                text: 'Essa ação não poderá ser desfeita.',
+                                icon: 'warning',
+
+                                showCancelButton: true,
+
+                                confirmButtonText: 'Sim, excluir',
+                                cancelButtonText: 'Cancelar',
+
+                                confirmButtonColor: '#8b2e2e',
+                                cancelButtonColor: '#6c757d'
+
+                            }).then((result) => {
+
+                                if (result.isConfirmed) {
+
+                                    formExcluir.submit();
+
+                                }
+
+                            });
+
+                        });
+
+                    }
+
+                </script>
+
+                <!-- MENSAGEM -->
+                <% if (typeof mensagem !=='undefined' && mensagem) { %>
+
+                    <script>
+
+                        Swal.fire({
+
+                            icon: '<%= mensagem.tipo %>',
+
+                            title: '<%= mensagem.tituloMensagem || "" %>',
+
+                            text: '<%= mensagem.valor %>',
+
+                            confirmButtonColor: '#8b2e2e',
+
+                            confirmButtonText: 'OK'
+
+                        });
+
+                    </script>
+
+                    <% } %>
+
+
+                        <style>
+                            /* =========================================
+           ESTRUTURA
+        ========================================= */
+
+                            .content {
+                                min-height: calc(100vh - 60px);
+                            }
+
+                            .card {
+                                border-radius: 12px;
+                            }
+
+
+                            /* =========================================
+           CABEÇALHO
+        ========================================= */
+
+                            .page-header {
+
+                                display: flex;
+
+                                justify-content: space-between;
+
+                                align-items: center;
+
+                                gap: 20px;
+
+                                flex-wrap: wrap;
+
+                            }
+
+                            .page-title {
+
+                                flex: 1;
+
+                                min-width: 250px;
+
+                            }
+
+                            .page-title h1 {
+
+                                font-size: 28px;
+
+                            }
+
+                            .header-actions {
+
+                                display: flex;
+
+                                align-items: center;
+
+                                justify-content: flex-end;
+
+                                gap: 10px;
+
+                                flex-wrap: wrap;
+
+                            }
+
+
+                            /* =========================================
+           BOTÃO CADASTRAR
+        ========================================= */
+
+                            .btn-cadastrar {
+
+                                background-color: #8b2e2e;
+
+                                border: 1px solid #8b2e2e;
+
+                                color: #fff;
+
+                                border-radius: 8px;
+
+                                padding: 9px 17px;
+
+                                font-size: 14px;
+
+                                font-weight: 600;
+
+                                min-height: 40px;
+
+                                display: inline-flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                transition: all 0.2s ease;
+
+                            }
+
+                            .btn-cadastrar:hover {
+
+                                background-color: #7a1f1f;
+
+                                border-color: #7a1f1f;
+
+                                color: #fff;
+
+                                transform: translateY(-1px);
+
+                            }
+
+
+                            /* =========================================
+           BOTÃO VOLTAR
+        ========================================= */
+
+                            .btn-voltar {
+
+                                background-color: #fff;
+
+                                border: 1px solid #d9dde1;
+
+                                color: #495057;
+
+                                border-radius: 8px;
+
+                                padding: 9px 17px;
+
+                                font-size: 14px;
+
+                                font-weight: 600;
+
+                                min-height: 40px;
+
+                                display: inline-flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                transition: all 0.2s ease;
+
+                            }
+
+                            .btn-voltar:hover {
+
+                                background-color: #f5f6f7;
+
+                                border-color: #bfc4c9;
+
+                                color: #343a40;
+
+                                transform: translateY(-1px);
+
+                            }
+
+
+                            /* =========================================
+           CARD DO VEÍCULO
+        ========================================= */
+
+                            .veiculo-card {
+
+                                background: #ffffff;
+
+                                border: 1px solid #e9ecef;
+
+                                border-radius: 12px;
+
+                                padding: 20px;
+
+                                height: 100%;
+
+                                transition: all 0.2s ease;
+
+                            }
+
+                            .veiculo-card:hover {
+
+                                border-color: #d7b1b1;
+
+                                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+
+                                transform: translateY(-2px);
+
+                            }
+
+
+                            /* =========================================
+           TOPO DO CARD
+        ========================================= */
+
+                            .veiculo-topo {
+
+                                display: flex;
+
+                                align-items: center;
+
+                                gap: 12px;
+
+                                padding-bottom: 18px;
+
+                                border-bottom: 1px solid #eeeeee;
+
+                            }
+
+
+                            .veiculo-icon {
+
+                                width: 48px;
+
+                                height: 48px;
+
+                                background: #f8eaea;
+
+                                color: #8b2e2e;
+
+                                border-radius: 10px;
+
+                                display: flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                font-size: 21px;
+
+                                flex-shrink: 0;
+
+                            }
+
+
+                            .veiculo-identificacao {
+
+                                flex: 1;
+
+                                min-width: 0;
+
+                            }
+
+
+                            .veiculo-label {
+
+                                display: block;
+
+                                color: #8a8f94;
+
+                                font-size: 10px;
+
+                                font-weight: 700;
+
+                                letter-spacing: 0.7px;
+
+                            }
+
+
+                            .veiculo-identificacao h4 {
+
+                                margin: 2px 0 0;
+
+                                font-size: 21px;
+
+                                font-weight: 700;
+
+                                color: #343a40;
+
+                            }
+
+
+                            /* =========================================
+           STATUS
+        ========================================= */
+
+                            .status {
+
+                                display: inline-flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                gap: 5px;
+
+                                padding: 5px 9px;
+
+                                border-radius: 20px;
+
+                                font-size: 12px;
+
+                                font-weight: 600;
+
+                                white-space: nowrap;
+
+                            }
+
+
+                            .status.ativo {
+
+                                color: #198754;
+
+                                background: #e9f7ef;
+
+                            }
+
+
+                            .status.inativo {
+
+                                color: #dc3545;
+
+                                background: #fbeaec;
+
+                            }
+
+
+                            /* =========================================
+           INFORMAÇÕES
+        ========================================= */
+
+                            .veiculo-info {
+
+                                padding: 18px 0;
+
+                                display: flex;
+
+                                flex-direction: column;
+
+                                gap: 14px;
+
+                            }
+
+
+                            .info-item {
+
+                                display: flex;
+
+                                align-items: center;
+
+                                gap: 12px;
+
+                            }
+
+
+                            .info-icon {
+
+                                width: 36px;
+
+                                height: 36px;
+
+                                border-radius: 8px;
+
+                                background: #f5f6f7;
+
+                                color: #8b2e2e;
+
+                                display: flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                flex-shrink: 0;
+
+                            }
+
+
+                            .info-item span {
+
+                                display: block;
+
+                                color: #8a8f94;
+
+                                font-size: 12px;
+
+                                margin-bottom: 2px;
+
+                            }
+
+
+                            .info-item strong {
+
+                                display: block;
+
+                                color: #343a40;
+
+                                font-size: 14px;
+
+                            }
+
+
+                            /* =========================================
+           AÇÕES
+        ========================================= */
+
+                            .veiculo-acoes {
+
+                                border-top: 1px solid #eeeeee;
+
+                                padding-top: 16px;
+
+                                display: flex;
+
+                                gap: 10px;
+
+                            }
+
+
+                            .veiculo-acoes .btn {
+
+                                flex: 1;
+
+                                min-width: 0;
+
+                                min-height: 38px;
+
+                                font-size: 13px;
+
+                                font-weight: 600;
+
+                                border-radius: 8px;
+
+                                display: inline-flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                transition: all 0.2s ease;
+
+                            }
+
+
+                            /* =========================================
+           EDITAR
+        ========================================= */
+
+                            .btn-editar {
+
+                                background-color: #fff;
+
+                                border: 1px solid #adb5bd;
+
+                                color: #495057;
+
+                            }
+
+
+                            .btn-editar:hover {
+
+                                background-color: #f5f6f7;
+
+                                border-color: #8f969d;
+
+                                color: #343a40;
+
+                                transform: translateY(-1px);
+
+                            }
+
+
+                            /* =========================================
+           EXCLUIR
+        ========================================= */
+
+                            .form-excluir {
+
+                                flex: 1;
+
+                                margin: 0;
+
+                                padding: 0;
+
+                                display: flex;
+
+                                min-width: 0;
+
+                            }
+
+
+                            .btn-excluir {
+
+                                width: 100%;
+
+                                background-color: #fff;
+
+                                border: 1px solid #b74c4c;
+
+                                color: #8b2e2e;
+
+                            }
+
+
+                            .btn-excluir:hover {
+
+                                background-color: #8b2e2e;
+
+                                border-color: #8b2e2e;
+
+                                color: #fff;
+
+                                transform: translateY(-1px);
+
+                            }
+
+
+                            /* =========================================
+           NENHUM VEÍCULO
+        ========================================= */
+
+                            .empty-state {
+
+                                text-align: center;
+
+                                padding: 60px 20px;
+
+                                border: 1px dashed #d5d9dc;
+
+                                border-radius: 12px;
+
+                                background: #fafafa;
+
+                            }
+
+
+                            .empty-icon {
+
+                                width: 58px;
+
+                                height: 58px;
+
+                                margin: 0 auto 18px;
+
+                                border-radius: 12px;
+
+                                background: #f8eaea;
+
+                                color: #8b2e2e;
+
+                                display: flex;
+
+                                align-items: center;
+
+                                justify-content: center;
+
+                                font-size: 25px;
+
+                            }
+
+
+                            .empty-state h4 {
+
+                                font-size: 18px;
+
+                                font-weight: 700;
+
+                                color: #343a40;
+
+                                margin-bottom: 7px;
+
+                            }
+
+
+                            .empty-state p {
+
+                                color: #7b8187;
+
+                                margin-bottom: 20px;
+
+                            }
+
+
+                            /* =========================================
+           TABLET / CELULAR
+        ========================================= */
+
+                            @media (max-width: 768px) {
+
+                                .container-fluid {
+
+                                    padding-left: 15px !important;
+
+                                    padding-right: 15px !important;
+
+                                }
+
+
+                                .card-body {
+
+                                    padding: 20px !important;
+
+                                }
+
+
+                                .page-header {
+
+                                    align-items: flex-start;
+
+                                }
+
+
+                                .page-title {
+
+                                    width: 100%;
+
+                                }
+
+
+                                .header-actions {
+
+                                    width: 100%;
+
+                                    justify-content: stretch;
+
+                                }
+
+
+                                .header-actions .btn {
+
+                                    flex: 1;
+
+                                }
+
+
+                                .veiculo-topo {
+
+                                    flex-wrap: wrap;
+
+                                }
+
+
+                                .status {
+
+                                    margin-left: auto;
+
+                                }
+
+                            }
+
+
+                            /* =========================================
+           CELULAR
+        ========================================= */
+
+                            @media (max-width: 480px) {
+
+                                .page-title h1 {
+
+                                    font-size: 23px;
+
+                                }
+
+
+                                .page-title p {
+
+                                    font-size: 13px;
+
+                                }
+
+
+                                .header-actions {
+
+                                    flex-direction: column;
+
+                                    width: 100%;
+
+                                }
+
+
+                                .header-actions .btn {
+
+                                    width: 100%;
+
+                                    flex: none;
+
+                                }
+
+
+                                .veiculo-acoes {
+
+                                    flex-direction: column;
+
+                                }
+
+
+                                .veiculo-acoes .btn,
+
+                                .form-excluir,
+
+                                .form-excluir .btn {
+
+                                    width: 100%;
+
+                                    flex: none;
+
+                                }
+
+                            }
+                        </style>
+
+    </body>
+
+</html>

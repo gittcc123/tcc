@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+
+<%- include('../../partials/header') %>
+
+<div class="d-flex">
+
+    <%- include('../../partials/sidebar') %>
+
+    <main class="content w-100">
+
+        <div class="container-fluid px-4 py-4">
+
+            <!-- CABEÇALHO -->
+
+            <div class="page-heading mb-4">
+
+                <div class="page-heading-content">
+
+                    <div class="page-heading-icon">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+
+                    <div>
+                      
+
+                        <h1>
+                            Editar alerta
+                        </h1>
+
+                        <p>
+                            Atualize as informações do alerta registrado no sistema.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="alerta-id">
+                    #<%= alertaParaEditar.id %>
+                </div>
+
+            </div>
+
+
+            <!-- MENSAGEM -->
+
+            <% if (mensagem) { %>
+
+                <div
+                    class="alert alert-<%= mensagem.tipo === 'success' ? 'success' : 'danger' %> alert-dismissible fade show shadow-sm"
+                    role="alert"
+                >
+
+                    <strong>
+                        <%= mensagem.tituloMensagem %>
+                    </strong>
+
+                    <%= mensagem.valor %>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                    ></button>
+
+                </div>
+
+            <% } %>
+
+
+            <!-- CARD -->
+
+            <div class="editar-wrapper">
+
+                <div class="editar-card">
+
+                    <!-- CABEÇALHO DO CARD -->
+
+                    <div class="card-top">
+
+                        <div class="card-top-icon">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+
+                        <div>
+
+                            <h5>
+                                Informações do alerta
+                            </h5>
+
+                            <p>
+                                Altere somente as informações necessárias e salve as modificações.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FORMULÁRIO -->
+
+                    <div class="card-content">
+
+                        <form
+                            action="/alerta/editar/<%= alertaParaEditar.id %>"
+                            method="POST"
+                        >
+
+                            <!-- TIPO -->
+
+                            <div class="field-group">
+
+                                <label for="tipo">
+                                    Tipo do alerta
+                                </label>
+
+                                <select
+                                    id="tipo"
+                                    name="tipo"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Selecione o tipo
+                                    </option>
+
+                                    <option
+                                        value="Urgente"
+                                        <%= alertaParaEditar.tipo === 'Urgente' ? 'selected' : '' %>
+                                    >
+                                        Urgente
+                                    </option>
+
+                                    <option
+                                        value="Atraso"
+                                        <%= alertaParaEditar.tipo === 'Atraso' ? 'selected' : '' %>
+                                    >
+                                        Atraso
+                                    </option>
+
+                                    <option
+                                        value="Problema no veículo"
+                                        <%= alertaParaEditar.tipo === 'Problema no veículo' ? 'selected' : '' %>
+                                    >
+                                        Problema no veículo
+                                    </option>
+
+                                    <option
+                                        value="Trânsito"
+                                        <%= alertaParaEditar.tipo === 'Trânsito' ? 'selected' : '' %>
+                                    >
+                                        Trânsito
+                                    </option>
+
+                                    <option
+                                        value="Acidente"
+                                        <%= alertaParaEditar.tipo === 'Acidente' ? 'selected' : '' %>
+                                    >
+                                        Acidente
+                                    </option>
+
+                                    <option
+                                        value="Aviso"
+                                        <%= alertaParaEditar.tipo === 'Aviso' ? 'selected' : '' %>
+                                    >
+                                        Aviso
+                                    </option>
+
+                                    <option
+                                        value="Informativo"
+                                        <%= alertaParaEditar.tipo === 'Informativo' ? 'selected' : '' %>
+                                    >
+                                        Informativo
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- MENSAGEM -->
+
+                            <div class="field-group">
+
+                                <div class="label-row">
+
+                                    <label for="mensagem">
+                                        Mensagem
+                                    </label>
+
+                                    <span class="field-limit">
+                                        Máximo de 500 caracteres
+                                    </span>
+
+                                </div>
+
+                                <textarea
+                                    id="mensagem"
+                                    name="mensagem"
+                                    class="form-control mensagem-field"
+                                    rows="7"
+                                    maxlength="500"
+                                    required
+                                ><%= alertaParaEditar.mensagem %></textarea>
+
+                                <div class="field-footer">
+
+                                    <small>
+                                        Mantenha a mensagem clara e objetiva.
+                                    </small>
+
+                                    <small id="contador">
+                                        0/500
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- STATUS -->
+
+                            <div class="field-group">
+
+                                <label for="status">
+                                    Status
+                                </label>
+
+                                <select
+                                    id="status"
+                                    name="status"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option
+                                        value="Ativo"
+                                        <%= alertaParaEditar.status === 'Ativo' ? 'selected' : '' %>
+                                    >
+                                        Ativo
+                                    </option>
+
+                                    <option
+                                        value="Inativo"
+                                        <%= alertaParaEditar.status === 'Inativo' ? 'selected' : '' %>
+                                    >
+                                        Inativo
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- DATA -->
+
+                            <% if (alertaParaEditar.data_criacao) { %>
+
+                                <div class="data-box">
+
+                                    <div class="data-box-icon">
+                                        <i class="bi bi-calendar3"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Data de registro
+                                        </span>
+
+                                        <strong>
+                                            <%= new Date(alertaParaEditar.data_criacao).toLocaleString('pt-BR') %>
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            <% } %>
+
+
+                            <!-- AÇÕES -->
+
+                            <div class="form-actions">
+
+                                <a
+                                    href="/alerta/listar"
+                                    class="btn btn-cancelar"
+                                >
+                                    <i class="bi bi-arrow-left"></i>
+                                    Cancelar
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-salvar"
+                                >
+                                    <i class="bi bi-check-lg"></i>
+                                    Salvar alterações
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    const campoMensagem = document.getElementById('mensagem');
+    const contador = document.getElementById('contador');
+
+    function atualizarContador() {
+
+        if (!campoMensagem || !contador) {
+            return;
+        }
+
+        contador.textContent =
+            campoMensagem.value.length + '/500';
+
+    }
+
+    if (campoMensagem) {
+
+        campoMensagem.addEventListener(
+            'input',
+            atualizarContador
+        );
+
+        atualizarContador();
+
+    }
+
+</script>
+
+
+<style>
+
+    .content {
+        min-height: 100vh;
+    }
+
+    .page-heading {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #8b2e2e;
+        border-radius: 12px;
+        padding: 22px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .page-heading-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-heading-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        background: #f8e8e8;
+        color: #8b2e2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .page-eyebrow {
+        display: block;
+        color: #8b2e2e;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .7px;
+        margin-bottom: 3px;
+    }
+
+    .page-heading h1 {
+        margin: 0;
+        color: #252525;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .page-heading p {
+        color: #747b83;
+        margin: 4px 0 0;
+        font-size: 13px;
+    }
+
+    .alerta-id {
+        padding: 7px 12px;
+        border-radius: 7px;
+        background: #f7f7f8;
+        border: 1px solid #e5e5e7;
+        color: #6c7279;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .editar-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .editar-card {
+        background: #ffffff;
+        border: 1px solid #e3e5e8;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,.045);
+    }
+
+    .card-top {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #eeeeef;
+        background: #fcfcfc;
+    }
+
+    .card-top-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 9px;
+        background: #f8e8e8;
+        color: #8b2e2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+    }
+
+    .card-top h5 {
+        margin: 0 0 3px;
+        color: #292929;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .card-top p {
+        margin: 0;
+        color: #7b8188;
+        font-size: 12px;
+    }
+
+    .card-content {
+        padding: 28px;
+    }
+
+    .field-group {
+        margin-bottom: 23px;
+    }
+
+    .field-group > label,
+    .label-row label {
+        display: block;
+        margin-bottom: 8px;
+        color: #30343a;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .label-row label {
+        margin-bottom: 8px;
+    }
+
+    .field-limit {
+        color: #999fa6;
+        font-size: 10px;
+        margin-bottom: 8px;
+    }
+
+    .form-select,
+    .form-control {
+        border-color: #dfe2e6;
+        border-radius: 8px;
+        color: #34383d;
+        font-size: 13px;
+    }
+
+    .form-select {
+        min-height: 44px;
+    }
+
+    .form-control {
+        padding: 11px 13px;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+        border-color: #a75a5a;
+        box-shadow: 0 0 0 .18rem rgba(139,46,46,.08);
+    }
+
+    .mensagem-field {
+        resize: vertical;
+        min-height: 145px;
+        line-height: 1.55;
+    }
+
+    .field-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 7px;
+    }
+
+    .field-footer small {
+        color: #858b92;
+        font-size: 11px;
+    }
+
+    .data-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f8f9fa;
+        border: 1px solid #e7e8ea;
+        border-radius: 9px;
+        padding: 13px 14px;
+        margin-bottom: 24px;
+    }
+
+    .data-box-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #8b2e2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #eeeeee;
+    }
+
+    .data-box span {
+        display: block;
+        color: #858b92;
+        font-size: 10px;
+        margin-bottom: 2px;
+    }
+
+    .data-box strong {
+        display: block;
+        color: #454a50;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 9px;
+        padding-top: 22px;
+        border-top: 1px solid #eeeeef;
+    }
+
+    .form-actions .btn {
+        min-height: 40px;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .btn-cancelar {
+        background: #ffffff;
+        color: #626970;
+        border: 1px solid #d9dde1;
+    }
+
+    .btn-cancelar:hover {
+        background: #f7f7f8;
+        color: #3f4449;
+        border-color: #c9cdd1;
+    }
+
+    .btn-salvar {
+        background: #8b2e2e;
+        color: #ffffff;
+        border: 1px solid #8b2e2e;
+    }
+
+    .btn-salvar:hover {
+        background: #752525;
+        color: #ffffff;
+        border-color: #752525;
+    }
+
+    @media (max-width: 768px) {
+
+        .container-fluid {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+
+        .page-heading {
+            padding: 18px;
+            align-items: flex-start;
+        }
+
+        .page-heading-content {
+            align-items: flex-start;
+        }
+
+        .page-heading h1 {
+            font-size: 21px;
+        }
+
+        .page-heading p {
+            font-size: 12px;
+        }
+
+        .alerta-id {
+            align-self: flex-start;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-top {
+            padding: 18px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+</style>
+
+</body>
+</html>

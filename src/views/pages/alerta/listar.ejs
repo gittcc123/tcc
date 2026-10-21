@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <!-- CABEÇALHO -->
+
+                <div class="page-header mb-4">
+
+                    <div class="page-header-info">
+
+                        <div class="page-title-row">
+
+                            <div class="page-icon">
+                                <i class="bi bi-bell"></i>
+                            </div>
+
+                            <div>
+
+                                <h1>
+                                    Alertas
+                                </h1>
+
+                                <p>
+                                    Consulte e gerencie os alertas registrados no sistema.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="page-actions">
+
+                        <!-- NOVO ALERTA -->
+                        <% if (
+                            usuario &&
+                            (
+                                usuario.tipo === 'ADMIN' ||
+                                usuario.tipo === 'MOTORISTA'
+                            )
+                        ) { %>
+
+                            <a
+                                href="/alerta/cadastrar"
+                                class="btn btn-novo"
+                            >
+                                <i class="bi bi-plus-lg me-1"></i>
+                                Novo alerta
+                            </a>
+
+                        <% } %>
+
+                        <!-- VOLTAR -->
+                        <a
+                            href="/dashboard"
+                            class="btn btn-voltar"
+                        >
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Voltar
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONTEÚDO -->
+
+                <div class="card alertas-card border-0 shadow-sm">
+
+                    <!-- CABEÇALHO DO CARD -->
+
+                    <div class="card-header alertas-card-header">
+
+                        <div>
+
+                            <h5 class="mb-1">
+                                Alertas registrados
+                            </h5>
+
+                            <span>
+                                Informações e ocorrências cadastradas no sistema
+                            </span>
+
+                        </div>
+
+                        <% if (alertas && alertas.length > 0) { %>
+
+                            <span class="total-alertas">
+
+                                <%= alertas.length %>
+
+                                <%= alertas.length === 1
+                                    ? 'alerta'
+                                    : 'alertas'
+                                %>
+
+                            </span>
+
+                        <% } %>
+
+                    </div>
+
+
+                    <!-- CORPO -->
+
+                    <div class="card-body p-0">
+
+                        <% if (alertas && alertas.length > 0) { %>
+
+                            <div class="table-responsive">
+
+                                <table class="table align-middle mb-0">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Tipo
+                                            </th>
+
+                                            <th>
+                                                Mensagem
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+
+                                            <th>
+                                                Data
+                                            </th>
+
+                                            <th class="text-center pe-4">
+                                                Ações
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        <% alertas.forEach(alerta => { %>
+
+                                            <tr>
+
+                                                <!-- TIPO -->
+
+                                                <td>
+
+                                                    <span class="tipo-badge">
+
+                                                        <%= alerta.tipo %>
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                <!-- MENSAGEM -->
+
+                                                <td>
+
+                                                    <div class="mensagem-alerta">
+
+                                                        <%= alerta.mensagem ||
+                                                            'Nenhuma mensagem informada.'
+                                                        %>
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                <!-- STATUS -->
+
+                                                <td>
+
+                                                    <% if (alerta.status === 'Ativo') { %>
+
+                                                        <span class="status-badge status-ativo">
+
+                                                            <span class="status-dot"></span>
+
+                                                            Ativo
+
+                                                        </span>
+
+                                                    <% } else if (alerta.status === 'Resolvido') { %>
+
+                                                        <span class="status-badge status-resolvido">
+
+                                                            <i class="bi bi-check-circle-fill"></i>
+
+                                                            Resolvido
+
+                                                        </span>
+
+                                                    <% } else { %>
+
+                                                        <span class="status-badge status-outro">
+
+                                                            <%= alerta.status %>
+
+                                                        </span>
+
+                                                    <% } %>
+
+                                                </td>
+
+
+                                                <!-- DATA -->
+
+                                                <td>
+
+                                                    <% if (alerta.data_criacao) { %>
+
+                                                        <div class="data-alerta">
+
+                                                            <strong>
+
+                                                                <%= new Date(alerta.data_criacao)
+                                                                    .toLocaleDateString('pt-BR') %>
+
+                                                            </strong>
+
+                                                            <small>
+
+                                                                <%= new Date(alerta.data_criacao)
+                                                                    .toLocaleTimeString('pt-BR', {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    }) %>
+
+                                                            </small>
+
+                                                        </div>
+
+                                                    <% } else { %>
+
+                                                        <span class="text-muted">
+                                                            —
+                                                        </span>
+
+                                                    <% } %>
+
+                                                </td>
+
+
+                                                <!-- AÇÕES -->
+
+                                                <td class="pe-4">
+
+                                                    <div class="acoes">
+
+                                                        <% if (
+                                                            usuario &&
+                                                            (
+                                                                usuario.tipo === 'ADMIN' ||
+                                                                usuario.tipo === 'MOTORISTA'
+                                                            )
+                                                        ) { %>
+
+                                                            <!-- EDITAR -->
+
+                                                            <a
+                                                                href="/alerta/editar/<%= alerta.id %>"
+                                                                class="btn btn-editar"
+                                                                title="Editar alerta"
+                                                            >
+
+                                                                <i class="bi bi-pencil"></i>
+
+                                                                <span>
+                                                                    Editar
+                                                                </span>
+
+                                                            </a>
+
+
+                                                            <!-- EXCLUIR -->
+
+                                                            <form
+                                                                class="form-excluir-alerta"
+                                                                action="/alerta/excluir/<%= alerta.id %>"
+                                                                method="POST"
+                                                            >
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn btn-excluir"
+                                                                    title="Excluir alerta"
+                                                                >
+
+                                                                    <i class="bi bi-trash"></i>
+
+                                                                    <span>
+                                                                        Excluir
+                                                                    </span>
+
+                                                                </button>
+
+                                                            </form>
+
+                                                        <% } else { %>
+
+                                                            <span class="sem-acoes">
+                                                                Sem ações
+                                                            </span>
+
+                                                        <% } %>
+
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+
+                                        <% }) %>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+
+                        <% } else { %>
+
+
+                            <!-- ESTADO VAZIO -->
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+
+                                    <i class="bi bi-bell-slash"></i>
+
+                                </div>
+
+                                <h4>
+                                    Nenhum alerta cadastrado
+                                </h4>
+
+                                <p>
+                                    Ainda não existem alertas registrados no sistema.
+                                </p>
+
+
+                                <!-- CRIAR ALERTA -->
+
+                                <% if (
+                                    usuario &&
+                                    (
+                                        usuario.tipo === 'ADMIN' ||
+                                        usuario.tipo === 'MOTORISTA'
+                                    )
+                                ) { %>
+
+                                    <a
+                                        href="/alerta/cadastrar"
+                                        class="btn btn-novo-alerta"
+                                    >
+
+                                        <i class="bi bi-plus-lg me-1"></i>
+
+                                        Criar novo alerta
+
+                                    </a>
+
+                                <% } %>
+
+                            </div>
+
+                        <% } %>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <!-- SWEETALERT -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        const formsExcluirAlertas =
+            document.getElementsByClassName('form-excluir-alerta');
+
+        for (const formExcluir of formsExcluirAlertas) {
+
+            formExcluir.addEventListener('submit', (e) => {
+
+                e.preventDefault();
+
+                Swal.fire({
+
+                    title: 'Excluir alerta?',
+
+                    text: 'Esta ação não poderá ser desfeita.',
+
+                    icon: 'warning',
+
+                    showCancelButton: true,
+
+                    confirmButtonText: 'Sim, excluir',
+
+                    cancelButtonText: 'Cancelar',
+
+                    confirmButtonColor: '#8b2e2e',
+
+                    cancelButtonColor: '#6c757d',
+
+                    reverseButtons: true
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        formExcluir.submit();
+
+                    }
+
+                });
+
+            });
+
+        }
+
+    </script>
+
+
+    <!-- MENSAGEM -->
+
+    <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+        <script>
+
+            Swal.fire({
+
+                icon: '<%= mensagem.tipo %>',
+
+                title:
+                    '<%= mensagem.tituloMensagem || "Aviso" %>',
+
+                text:
+                    '<%= mensagem.valor %>',
+
+                confirmButtonColor: '#8b2e2e',
+
+                confirmButtonText: 'OK'
+
+            });
+
+        </script>
+
+    <% } %>
+
+
+    <style>
+
+        /* =========================
+           BASE
+        ========================= */
+
+        .content {
+
+            min-height: 100vh;
+
+            background: #f4f6f9;
+
+        }
+
+
+        /* =========================
+           CABEÇALHO
+        ========================= */
+
+        .page-header {
+
+            background: #ffffff;
+
+            border-left: 5px solid #8b2e2e;
+
+            border-radius: 12px;
+
+            padding: 22px 24px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow:
+                0 3px 12px rgba(0, 0, 0, 0.05);
+
+        }
+
+
+        .page-title-row {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+        }
+
+
+        .page-icon {
+
+            width: 46px;
+
+            height: 46px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: #f8e8e8;
+
+            color: #8b2e2e;
+
+            font-size: 1.35rem;
+
+        }
+
+
+        .page-header h1 {
+
+            color: #7a1f1f;
+
+            font-size: 1.55rem;
+
+            font-weight: 700;
+
+            margin: 0 0 3px;
+
+        }
+
+
+        .page-header p {
+
+            color: #73777b;
+
+            font-size: 0.9rem;
+
+            margin: 0;
+
+        }
+
+
+        /* =========================
+           BOTÕES DO CABEÇALHO
+        ========================= */
+
+        .page-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 9px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .page-actions .btn {
+
+            height: 42px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 8px;
+
+            padding: 0 17px;
+
+            font-size: 0.88rem;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+        }
+
+
+        .btn-novo {
+
+            background: #8b2e2e;
+
+            color: #ffffff;
+
+            border: 1px solid #8b2e2e;
+
+        }
+
+
+        .btn-novo:hover {
+
+            background: #742525;
+
+            border-color: #742525;
+
+            color: #ffffff;
+
+        }
+
+
+        .btn-voltar {
+
+            background: #ffffff;
+
+            color: #555;
+
+            border: 1px solid #d9d9d9;
+
+        }
+
+
+        .btn-voltar:hover {
+
+            background: #f5f5f5;
+
+            color: #333;
+
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .alertas-card {
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            background: #ffffff;
+
+        }
+
+
+        .alertas-card-header {
+
+            min-height: 72px;
+
+            padding: 16px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #eeeeee;
+
+        }
+
+
+        .alertas-card-header h5 {
+
+            color: #343434;
+
+            font-weight: 700;
+
+            font-size: 1rem;
+
+        }
+
+
+        .alertas-card-header span {
+
+            color: #858585;
+
+            font-size: 0.82rem;
+
+        }
+
+
+        .total-alertas {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-width: 72px;
+
+            padding: 7px 11px;
+
+            border-radius: 7px;
+
+            background: #f8e5e5;
+
+            color: #8b2e2e !important;
+
+            font-size: 0.78rem !important;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =========================
+           TABELA
+        ========================= */
+
+        .table {
+
+            margin: 0;
+
+        }
+
+
+        .table thead {
+
+            background: #fafafa;
+
+        }
+
+
+        .table thead th {
+
+            padding: 14px 12px;
+
+            border-bottom: 1px solid #e9e9e9;
+
+            color: #747474;
+
+            font-size: 0.72rem;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: .04em;
+
+            white-space: nowrap;
+
+        }
+
+
+        .table tbody tr {
+
+            border-bottom: 1px solid #f0f0f0;
+
+            transition: background .15s ease;
+
+        }
+
+
+        .table tbody tr:last-child {
+
+            border-bottom: 0;
+
+        }
+
+
+        .table tbody tr:hover {
+
+            background: #fdf9f9;
+
+        }
+
+
+        .table td {
+
+            padding: 16px 12px;
+
+            border: 0;
+
+            color: #343a40;
+
+            vertical-align: middle;
+
+        }
+
+
+        /* =========================
+           TIPO
+        ========================= */
+
+        .tipo-badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 6px 10px;
+
+            border-radius: 7px;
+
+            background: #f8e5e5;
+
+            color: #8b2e2e;
+
+            font-size: 0.74rem;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =========================
+           MENSAGEM
+        ========================= */
+
+        .mensagem-alerta {
+
+            max-width: 430px;
+
+            color: #444;
+
+            font-size: 0.87rem;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status-badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 6px 10px;
+
+            border-radius: 7px;
+
+            font-size: 0.74rem;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+        }
+
+
+        .status-ativo {
+
+            background: #eaf6ef;
+
+            color: #216e3a;
+
+        }
+
+
+        .status-dot {
+
+            width: 7px;
+
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #2e8b57;
+
+        }
+
+
+        .status-resolvido {
+
+            background: #edf3ff;
+
+            color: #315ca8;
+
+        }
+
+
+        .status-outro {
+
+            background: #f1f3f5;
+
+            color: #6c757d;
+
+        }
+
+
+        /* =========================
+           DATA
+        ========================= */
+
+        .data-alerta {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 2px;
+
+            white-space: nowrap;
+
+        }
+
+
+        .data-alerta strong {
+
+            color: #4c5155;
+
+            font-size: 0.8rem;
+
+            font-weight: 600;
+
+        }
+
+
+        .data-alerta small {
+
+            color: #92979b;
+
+            font-size: 0.7rem;
+
+        }
+
+
+        /* =========================
+           AÇÕES
+        ========================= */
+
+        .acoes {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            white-space: nowrap;
+
+        }
+
+
+        .acoes .btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 4px;
+
+            min-height: 34px;
+
+            padding: 6px 10px;
+
+            border-radius: 7px;
+
+            font-size: 0.74rem;
+
+            font-weight: 600;
+
+        }
+
+
+        .btn-editar {
+
+            background: #8b2e2e;
+
+            color: #ffffff;
+
+            border: 1px solid #8b2e2e;
+
+        }
+
+
+        .btn-editar:hover {
+
+            background: #742525;
+
+            border-color: #742525;
+
+            color: #ffffff;
+
+        }
+
+
+        .btn-excluir {
+
+            background: #ffffff;
+
+            color: #8b2e2e;
+
+            border: 1px solid #d6a5a5;
+
+        }
+
+
+        .btn-excluir:hover {
+
+            background: #fdf1f1;
+
+            color: #742525;
+
+            border-color: #b97a7a;
+
+        }
+
+
+        .sem-acoes {
+
+            color: #aaa;
+
+            font-size: 0.75rem;
+
+        }
+
+
+        /* =========================
+           ESTADO VAZIO
+        ========================= */
+
+        .empty-state {
+
+            padding: 70px 20px;
+
+            text-align: center;
+
+        }
+
+
+        .empty-icon {
+
+            width: 68px;
+
+            height: 68px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #f8e5e5;
+
+            color: #8b2e2e;
+
+            font-size: 27px;
+
+        }
+
+
+        .empty-state h4 {
+
+            color: #343434;
+
+            font-weight: 700;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .empty-state p {
+
+            color: #73777b;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .btn-novo-alerta {
+
+            background: #8b2e2e;
+
+            color: #ffffff;
+
+            border: 1px solid #8b2e2e;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+            padding: 9px 17px;
+
+        }
+
+
+        .btn-novo-alerta:hover {
+
+            background: #742525;
+
+            border-color: #742525;
+
+            color: #ffffff;
+
+        }
+
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media (max-width: 992px) {
+
+            .page-header {
+
+                align-items: flex-start;
+
+            }
+
+
+            .page-actions {
+
+                flex-wrap: wrap;
+
+            }
+
+
+            .mensagem-alerta {
+
+                max-width: 300px;
+
+            }
+
+        }
+
+
+        @media (max-width: 768px) {
+
+            .container-fluid {
+
+                padding-left: 15px !important;
+
+                padding-right: 15px !important;
+
+            }
+
+
+            .page-header {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+                padding: 18px;
+
+            }
+
+
+            .page-title-row {
+
+                align-items: flex-start;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 1.35rem;
+
+            }
+
+
+            .page-actions {
+
+                width: 100%;
+
+                display: grid;
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .page-actions .btn {
+
+                width: 100%;
+
+            }
+
+
+            .alertas-card-header {
+
+                align-items: flex-start;
+
+            }
+
+
+            .mensagem-alerta {
+
+                max-width: 230px;
+
+            }
+
+
+            .acoes {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+
+            .acoes .btn {
+
+                width: 100%;
+
+            }
+
+        }
+
+
+        @media (max-width: 576px) {
+
+            .alertas-card-header {
+
+                flex-direction: column;
+
+            }
+
+
+            .total-alertas {
+
+                align-self: flex-start;
+
+            }
+
+
+            .table td {
+
+                padding: 13px 10px;
+
+            }
+
+        }
+
+    </style>
+
+</body>
+
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <div class="content w-100">
+
+            <div class="container-fluid py-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4">
+
+                       
+
+                        <div class="mb-4">
+
+                            <h1 class="text-danger fw-bold mb-1">
+                                Editar Cidade
+                            </h1>
+
+                            <p class="text-muted mb-0">
+                                Altere os dados da cidade cadastrada.
+                            </p>
+
+                        </div>
+
+
+                        <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+                            <div class="alert
+                                <%= mensagem.tipo === 'success'
+                                    ? 'alert-success'
+                                    : 'alert-danger' %>
+                                alert-dismissible fade show"
+                                role="alert">
+
+                                <strong>
+                                    <%= mensagem.tituloMensagem %>
+                                </strong>
+
+                                <br>
+
+                                <%= mensagem.valor %>
+
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                                </button>
+
+                            </div>
+
+                        <% } %>
+
+
+
+                        <form
+                            action="/cidade/editar/<%= cidade.id %>"
+                            method="POST"
+                        >
+
+                            <div class="row g-4">
+
+
+
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="nome"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Nome da Cidade
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="nome"
+                                        name="nome"
+                                        class="form-control"
+                                        value="<%= cidade.nome %>"
+                                        maxlength="60"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="cep"
+                                        class="form-label fw-semibold"
+                                    >
+                                        CEP
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="cep"
+                                        name="cep"
+                                        class="form-control"
+                                        value="<%= cidade.cep %>"
+                                        maxlength="10"
+                                        placeholder="00000-000"
+                                        required
+                                    >
+
+                                </div>
+
+
+
+                                <div class="col-md-12">
+
+                                    <label
+                                        for="estado_id"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Estado
+                                    </label>
+
+                                    <select
+                                        id="estado_id"
+                                        name="estado_id"
+                                        class="form-select"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Selecione o estado
+                                        </option>
+
+
+                                        <% estados.forEach(estado => { %>
+
+                                            <option
+                                                value="<%= estado.id %>"
+                                                <%= Number(cidade.estado_id) === Number(estado.id)
+                                                    ? 'selected'
+                                                    : '' %>
+                                            >
+
+                                                <%= estado.nome_estado %>
+                                                -
+                                                <%= estado.sigla_estado %>
+
+                                            </option>
+
+                                        <% }) %>
+
+                                    </select>
+
+                                    <div class="form-text">
+                                        Selecione o estado ao qual esta cidade pertence.
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div class="d-flex gap-2 mt-4">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger px-4"
+                                >
+
+                                   Atualizar Cidade
+
+                                </button>
+
+
+                                <a
+                                    href="/cidade/listar"
+                                    class="btn btn-outline-secondary px-4"
+                                >
+
+                                    Voltar
+
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <script>
+
+    
+
+        const cep =
+            document.getElementById('cep');
+
+        cep.addEventListener('input', function () {
+
+            let valor =
+                this.value.replace(/\D/g, '');
+
+            valor =
+                valor.substring(0, 8);
+
+            if (valor.length > 5) {
+
+                valor =
+                    valor.substring(0, 5)
+                    + '-'
+                    + valor.substring(5);
+
+            }
+
+            this.value = valor;
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <div class="content w-100">
+
+            <div class="container-fluid py-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4">
+
+                        <div class="mb-4">
+
+                            <h1 class="text-danger fw-bold mb-1">
+                                Editar Estado
+                            </h1>
+
+                            <p class="text-muted mb-0">
+                                Altere os dados do estado cadastrado.
+                            </p>
+
+                        </div>
+
+
+                        <form
+                            action="/estado/editar/<%= estado.id %>"
+                            method="POST"
+                        >
+
+                            <div class="row g-4">
+
+
+                                <!-- NOME -->
+
+                                <div class="col-md-8">
+
+                                    <label
+                                        for="nome_estado"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Nome do Estado
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="nome_estado"
+                                        name="nome_estado"
+                                        class="form-control"
+                                        value="<%= estado.nome_estado %>"
+                                        maxlength="60"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <!-- SIGLA -->
+
+                                <div class="col-md-4">
+
+                                    <label
+                                        for="sigla_estado"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Sigla
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="sigla_estado"
+                                        name="sigla_estado"
+                                        class="form-control text-uppercase"
+                                        value="<%= estado.sigla_estado %>"
+                                        maxlength="2"
+                                        required
+                                    >
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+
+                            <div class="d-flex gap-2 mt-4">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger"
+                                >
+                                    💾 Atualizar Estado
+                                </button>
+
+
+                                <a
+                                    href="/estado/listar"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    ↩️ Voltar
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <script>
+
+        const sigla =
+            document.getElementById('sigla_estado');
+
+        sigla.addEventListener('input', function () {
+
+            this.value =
+                this.value.toUpperCase();
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

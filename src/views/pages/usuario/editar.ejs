@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+<%- include('../../partials/header') %>
+
+<div class="d-flex">
+
+<%- include('../../partials/sidebar') %>
+
+<div class="content">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <h1 class="text-danger fw-bold mb-4">
+                Editar Usuário
+            </h1>
+
+            <% if(mensagem){ %>
+                <div class="alert alert-<%= mensagem.tipo === 'success' ? 'success' : 'danger' %>">
+                    <%= mensagem.valor %>
+                </div>
+            <% } %>
+
+            <div class="text-center mb-4">
+
+                <div
+                    class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center"
+                    style="width:90px;height:90px;font-size:36px;font-weight:bold;">
+
+                    <%= usuarioParaEditar.nome.charAt(0).toUpperCase() %>
+
+                </div>
+
+                <h3 class="mt-3">
+                    <%= usuarioParaEditar.nome %>
+                </h3>
+
+                <p class="text-muted">
+                    <%= usuarioParaEditar.email %>
+                </p>
+
+            </div>
+
+            <form action="/usuario/editar/<%= usuarioParaEditar.id %>" method="POST">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label for="nome" class="form-label">
+                            Nome
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nome"
+                            name="nome"
+                            value="<%= usuarioParaEditar.nome %>"
+                            required>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label for="email" class="form-label">
+                            E-mail
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            value="<%= usuarioParaEditar.email %>"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label for="tipo" class="form-label">
+                            Tipo de Usuário
+                        </label>
+
+                        <select
+                            name="tipo"
+                            id="tipo"
+                            class="form-select">
+
+                            <option
+                            <%= usuarioParaEditar.tipo.nome === 'ADMIN' ? 'selected' : '' %>
+                            value="ADMIN">
+                                Administrador
+                            </option>
+
+                            <option
+                            <%= usuarioParaEditar.tipo.nome === 'USUARIO' ? 'selected' : '' %>
+                            value="USUARIO">
+                                Usuário
+                            </option>
+
+                            <option
+                            <%= usuarioParaEditar.tipo.nome === 'MOTORISTA' ? 'selected' : '' %>
+                            value="MOTORISTA">
+                                Motorista
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            ID do Usuário
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control bg-light"
+                            value="<%= usuarioParaEditar.id %>"
+                            readonly>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        onclick="confirmarExclusao()">
+
+                        Excluir Usuário
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger">
+
+                        Salvar Alterações
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <form
+                id="formExcluir"
+                action="/usuario/excluir/<%= usuarioParaEditar.id %>"
+                method="POST">
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+<%- include('../../partials/scripts') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+function confirmarExclusao(){
+
+    Swal.fire({
+        title: 'Deseja excluir este usuário?',
+        text: 'Esta ação não poderá ser desfeita.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+
+        if(result.isConfirmed){
+
+            document.getElementById('formExcluir').submit();
+
+        }
+
+    });
+
+}
+
+</script>
+
+<% if (mensagem) { %>
+
+<script>
+
+Swal.fire({
+    icon: '<%= mensagem.tipo %>',
+    title: '<%= mensagem.titulo %>',
+    text: '<%= mensagem.valor %>'
+});
+
+</script>
+
+<% } %>
+
+</body>
+</html>

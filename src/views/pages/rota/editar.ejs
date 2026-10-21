@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <style>
+
+                :root {
+                    --red-main: #7a1f1f;
+                    --red-dark: #5f1717;
+                    --red-light: #faf3f3;
+                    --border: #e3e3e3;
+                    --muted: #737373;
+                }
+
+                .rota-form-page {
+                    padding: 30px;
+                }
+
+                .rota-form-header {
+                    border-left: 4px solid var(--red-main);
+                    padding-left: 16px;
+                    margin-bottom: 28px;
+                }
+
+                .rota-form-title {
+                    color: var(--red-main);
+                    font-size: 30px;
+                    font-weight: 800;
+                    margin: 0;
+                }
+
+                .rota-form-description {
+                    color: var(--muted);
+                    font-size: 14px;
+                    margin: 6px 0 0;
+                }
+
+                .rota-line {
+                    width: 45px;
+                    height: 3px;
+                    background: var(--red-main);
+                    border-radius: 4px;
+                    margin-top: 12px;
+                }
+
+                .rota-form-card {
+                    background: white;
+                    border: 1px solid var(--border);
+                    border-top: 3px solid var(--red-main);
+                    border-radius: 10px;
+                    box-shadow: 0 5px 20px rgba(0,0,0,.05);
+                }
+
+                .rota-form-card .form-label {
+                    color: #333;
+                    font-weight: 600;
+                }
+
+                .rota-form-card .form-control {
+                    border: 1px solid #d7d7d7;
+                    border-radius: 7px;
+                    padding: 11px 13px;
+                }
+
+                .rota-form-card .form-control:focus {
+                    border-color: var(--red-main);
+                    box-shadow: 0 0 0 .2rem rgba(122,31,31,.10);
+                }
+
+                .form-text {
+                    color: var(--muted);
+                    font-size: 12px;
+                }
+
+                .rota-info {
+                    background: #fafafa;
+                    border-left: 4px solid var(--red-main);
+                    border-radius: 7px;
+                    padding: 15px;
+                    color: #555;
+                    font-size: 13px;
+                }
+
+                .btn-salvar {
+                    background: var(--red-main);
+                    color: white;
+                    border: none;
+                    border-radius: 7px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                }
+
+                .btn-salvar:hover {
+                    background: var(--red-dark);
+                    color: white;
+                }
+
+                .btn-voltar {
+                    background: white;
+                    color: #555;
+                    border: 1px solid #d5d5d5;
+                    border-radius: 7px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                }
+
+                .btn-voltar:hover {
+                    color: var(--red-main);
+                    border-color: var(--red-main);
+                }
+
+                .rota-identificacao {
+                    color: var(--muted);
+                    font-size: 13px;
+                    margin-top: 5px;
+                }
+
+                .rota-identificacao strong {
+                    color: var(--red-main);
+                }
+
+            </style>
+
+
+            <div class="rota-form-page">
+
+
+                <!-- CABEÇALHO -->
+
+                <div class="rota-form-header">
+
+                    <h1 class="rota-form-title">
+                        Editar Rota
+                    </h1>
+
+                    <p class="rota-form-description">
+                        Atualize os dados da rota cadastrada no sistema.
+                    </p>
+
+                    <div class="rota-line"></div>
+
+                    <div class="rota-identificacao">
+
+                        Rota
+                        <strong>
+                            #<%= rotaParaEditar.id %>
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARD -->
+
+                <div class="rota-form-card">
+
+                    <div class="card-body p-4">
+
+
+                        <!-- MENSAGEM -->
+
+                        <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+                            <div class="alert <%= mensagem.tipo === 'success'
+                                ? 'alert-success'
+                                : 'alert-danger' %>">
+
+                                <strong>
+                                    <%= mensagem.tituloMensagem %>
+                                </strong>
+
+                                <div class="mt-1">
+                                    <%= mensagem.valor %>
+                                </div>
+
+                            </div>
+
+                        <% } %>
+
+
+                        <!-- FORMULÁRIO -->
+
+                        <form
+                            action="/rota/editar/<%= rotaParaEditar.id %>"
+                            method="POST"
+                        >
+
+                            <div class="row g-4">
+
+
+                                <!-- DESCRIÇÃO -->
+
+                                <div class="col-md-8">
+
+                                    <label
+                                        for="descricao"
+                                        class="form-label"
+                                    >
+                                        Descrição da rota
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="descricao"
+                                        name="descricao"
+                                        class="form-control"
+                                        value="<%= rotaParaEditar.descricao %>"
+                                        maxlength="255"
+                                        required
+                                    >
+
+                                    <div class="form-text mt-1">
+                                        Nome utilizado para identificar a rota.
+                                    </div>
+
+                                </div>
+
+
+                                <!-- TEMPO -->
+
+                                <div class="col-md-4">
+
+                                    <label
+                                        for="tempo_medio"
+                                        class="form-label"
+                                    >
+                                        Tempo médio
+                                    </label>
+
+                                    <div class="input-group">
+
+                                        <input
+                                            type="number"
+                                            id="tempo_medio"
+                                            name="tempo_medio"
+                                            class="form-control"
+                                            value="<%= rotaParaEditar.tempo_medio %>"
+                                            min="1"
+                                            required
+                                        >
+
+                                        <span class="input-group-text">
+                                            min
+                                        </span>
+
+                                    </div>
+
+                                    <div class="form-text mt-1">
+                                        Tempo estimado para completar a rota.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- INFORMAÇÃO -->
+
+                            <div class="rota-info mt-4">
+
+                                <strong>
+                                    Pontos da rota
+                                </strong>
+
+                                <div class="mt-1">
+                                    A associação dos pontos é gerenciada
+                                    separadamente na área de Pontos e Rotas.
+                                </div>
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+
+                            <div class="d-flex gap-2 mt-4">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-salvar"
+                                >
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    Salvar alterações
+                                </button>
+
+
+                                <a
+                                    href="/rota/listar"
+                                    class="btn btn-voltar"
+                                >
+                                    Voltar
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <%- include('../../partials/scripts') %>
+
+</body>
+
+</html>

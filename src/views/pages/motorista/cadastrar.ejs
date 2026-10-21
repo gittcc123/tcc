@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+<%- include('../../partials/header') %>
+
+<div class="d-flex">
+
+    <%- include('../../partials/sidebar') %>
+
+    <main class="content w-100">
+
+        <div class="container-fluid px-4 py-4">
+
+            <div class="page-header mb-4">
+
+                <div>
+                    <h1 class="fw-bold mb-1">
+                        Cadastro de Motorista
+                    </h1>
+
+                    <p class="text-muted mb-0">
+                        Vincule um usuário existente a um motorista.
+                    </p>
+                </div>
+
+            </div>
+
+            <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+                <div class="alert alert-<%= mensagem.tipo === 'success' ? 'success' : 'danger' %> shadow-sm border-0 mb-4">
+
+                    <div class="d-flex align-items-start gap-3">
+
+                        <div>
+                            <strong>
+                                <%= mensagem.tituloMensagem || 'Mensagem' %>
+                            </strong>
+
+                            <div class="mt-1">
+                                <%= mensagem.valor %>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <% } %>
+
+            <div class="card motorista-card border-0 shadow-sm">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <div class="form-section-title mb-4">
+
+                        <h5 class="fw-bold mb-1">
+                            Dados do motorista
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Selecione um usuário que ainda não esteja cadastrado como motorista.
+                        </p>
+
+                    </div>
+
+                    <form
+                        action="/motorista/cadastrar"
+                        method="POST"
+                    >
+
+                        <div class="row g-4">
+
+                            <!-- USUÁRIO -->
+
+                            <div class="col-lg-6">
+
+                                <label
+                                    for="usuario_id"
+                                    class="form-label fw-semibold"
+                                >
+                                    Usuário
+                                </label>
+
+                                <select
+                                    id="usuario_id"
+                                    name="usuario_id"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Selecione o usuário
+                                    </option>
+
+                                    <% if (usuarios && usuarios.length > 0) { %>
+
+                                        <% usuarios.forEach(u => { %>
+
+                                            <% if (
+                                                u.tipo !== 'ADMIN' &&
+                                                Number(u.id) !== Number(usuario.id)
+                                            ) { %>
+
+                                                <option
+                                                    value="<%= u.id %>"
+                                                    <%= u.jaMotorista ? 'disabled' : '' %>
+                                                >
+
+                                                    <%= u.nome %> - <%= u.email %>
+
+                                                    <% if (u.jaMotorista) { %>
+                                                        — Motorista já cadastrado
+                                                    <% } %>
+
+                                                </option>
+
+                                            <% } %>
+
+                                        <% }) %>
+
+                                    <% } %>
+
+                                </select>
+
+                                <div class="form-text">
+                                    Usuários que já possuem cadastro de motorista ficam indisponíveis.
+                                </div>
+
+                                <div class="mt-3">
+
+                                    <a
+                                        href="/admin/usuario/cadastrar"
+                                        class="btn btn-outline-danger btn-sm"
+                                    >
+                                        <i class="bi bi-person-plus me-1"></i>
+                                        Cadastrar novo usuário
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- TELEFONE -->
+
+                            <div class="col-lg-6">
+
+                                <label
+                                    for="telefone"
+                                    class="form-label fw-semibold"
+                                >
+                                    Telefone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="telefone"
+                                    name="telefone"
+                                    class="form-control"
+                                    placeholder="Ex: (17) 99999-9999"
+                                    maxlength="20"
+                                    required
+                                >
+
+                                <div class="form-text">
+                                    Informe um telefone para contato com o motorista.
+                                </div>
+
+                            </div>
+
+
+                            <!-- STATUS -->
+
+                            <div class="col-lg-6">
+
+                                <label
+                                    for="ativo"
+                                    class="form-label fw-semibold"
+                                >
+                                    Status
+                                </label>
+
+                                <select
+                                    id="ativo"
+                                    name="ativo"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    <option value="true">
+                                        Ativo
+                                    </option>
+
+                                    <option value="false">
+                                        Inativo
+                                    </option>
+
+                                </select>
+
+                                <div class="form-text">
+                                    Define se o motorista estará ativo no sistema.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- AÇÕES -->
+
+                        <div class="form-actions mt-5 pt-4">
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger px-4"
+                            >
+                                Salvar Motorista
+                            </button>
+
+                            <a
+                                href="/motorista/listar"
+                                class="btn btn-outline-secondary px-4"
+                            >
+                                Voltar
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<style>
+
+    .content {
+        min-height: calc(100vh - 70px);
+        background: #f4f6f9;
+    }
+
+    .page-header {
+        background: #ffffff;
+        border-left: 5px solid #8b2e2e;
+        border-radius: 10px;
+        padding: 22px 24px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-header h1 {
+        color: #7a1f1f;
+        font-size: 1.7rem;
+    }
+
+    .motorista-card {
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .form-section-title {
+        border-bottom: 1px solid #eeeeee;
+        padding-bottom: 18px;
+    }
+
+    .form-section-title h5 {
+        color: #7a1f1f;
+    }
+
+    .form-label {
+        color: #343434;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 46px;
+        border: 1px solid #d8d8d8;
+        border-radius: 8px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #8b2e2e;
+        box-shadow: 0 0 0 0.2rem rgba(139, 46, 46, 0.12);
+    }
+
+    .form-text {
+        color: #777;
+        font-size: 0.85rem;
+        margin-top: 7px;
+    }
+
+    .btn-danger {
+        background: #8b2e2e;
+        border-color: #8b2e2e;
+    }
+
+    .btn-danger:hover {
+        background: #7a1f1f;
+        border-color: #7a1f1f;
+    }
+
+    .btn-outline-danger {
+        color: #8b2e2e;
+        border-color: #8b2e2e;
+    }
+
+    .btn-outline-danger:hover {
+        background: #8b2e2e;
+        border-color: #8b2e2e;
+        color: #ffffff;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        border-top: 1px solid #eeeeee;
+    }
+
+    @media (max-width: 768px) {
+
+        .container-fluid {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+
+        .page-header {
+            padding: 18px;
+        }
+
+        .page-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .motorista-card .card-body {
+            padding: 22px !important;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<%- include('../../partials/scripts') %>
+
+
+</body>
+</html>

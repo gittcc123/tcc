@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 px-lg-5 py-4">
+
+                <%
+                    function formatarDataLocal(data) {
+
+                        if (!data) {
+                            return '';
+                        }
+
+                        const d = new Date(data);
+
+                        if (isNaN(d.getTime())) {
+                            return '';
+                        }
+
+                        const ano = d.getFullYear();
+
+                        const mes = String(
+                            d.getMonth() + 1
+                        ).padStart(2, '0');
+
+                        const dia = String(
+                            d.getDate()
+                        ).padStart(2, '0');
+
+                        const hora = String(
+                            d.getHours()
+                        ).padStart(2, '0');
+
+                        const minuto = String(
+                            d.getMinutes()
+                        ).padStart(2, '0');
+
+                        return `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+                    }
+                %>
+
+
+                <!-- CABEÇALHO -->
+                <div class="page-header mb-4">
+
+                    <div>
+
+                        <h1 class="page-title">
+                            Editar Escala
+                        </h1>
+
+                        <p class="page-subtitle">
+                            Altere as informações da escala do motorista.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="/escalamotorista/listar"
+                        class="btn btn-outline-secondary"
+                    >
+                        Voltar
+                    </a>
+
+                </div>
+
+
+                <!-- MENSAGEM -->
+                <% if (mensagem) { %>
+
+                    <div
+                        class="alert <%= mensagem.tipo === 'success' ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show"
+                        role="alert"
+                    >
+
+                        <strong>
+                            <%= mensagem.titulo %>
+                        </strong>
+
+                        <%= mensagem.valor %>
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Fechar"
+                        ></button>
+
+                    </div>
+
+                <% } %>
+
+
+                <!-- FORMULÁRIO -->
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-bold mb-4">
+                            Informações da escala
+                        </h5>
+
+
+                        <form
+                            action="/escalamotorista/editar/<%= escalaMotorista.id %>"
+                            method="POST"
+                            id="formEditarEscalaMotorista"
+                        >
+
+                            <div class="row g-4">
+
+
+                                <!-- MOTORISTA -->
+                                <div class="col-12 col-md-6">
+
+                                    <label
+                                        for="motorista_id"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Motorista
+                                    </label>
+
+                                    <select
+                                        name="motorista_id"
+                                        id="motorista_id"
+                                        class="form-select"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Selecione o motorista
+                                        </option>
+
+                                        <% if (motoristas && motoristas.length > 0) { %>
+
+                                            <% motoristas.forEach(motorista => { %>
+
+                                                <option
+                                                    value="<%= motorista.id %>"
+                                                    <%= Number(escalaMotorista.motorista.id) === Number(motorista.id) ? 'selected' : '' %>
+                                                >
+                                                    <%= motorista.usuario?.nome || 'Motorista sem nome' %>
+                                                </option>
+
+                                            <% }) %>
+
+                                        <% } %>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- VEÍCULO -->
+                                <div class="col-12 col-md-6">
+
+                                    <label
+                                        for="veiculo_id"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Veículo
+                                    </label>
+
+                                    <select
+                                        name="veiculo_id"
+                                        id="veiculo_id"
+                                        class="form-select"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Selecione o veículo
+                                        </option>
+
+                                        <% if (veiculos && veiculos.length > 0) { %>
+
+                                            <% veiculos.forEach(veiculo => { %>
+
+                                                <option
+                                                    value="<%= veiculo.id %>"
+                                                    <%= Number(escalaMotorista.veiculo.id) === Number(veiculo.id) ? 'selected' : '' %>
+                                                >
+                                                    Nº <%= veiculo.numero_veiculo %>
+                                                    <% if (veiculo.placa) { %>
+                                                        - <%= veiculo.placa %>
+                                                    <% } %>
+                                                </option>
+
+                                            <% }) %>
+
+                                        <% } %>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- ESCALA -->
+                                <div class="col-12">
+
+                                    <label
+                                        for="escala_id"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Escala
+                                    </label>
+
+                                    <select
+                                        name="escala_id"
+                                        id="escala_id"
+                                        class="form-select"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Selecione a escala
+                                        </option>
+
+                                        <% if (escalas && escalas.length > 0) { %>
+
+                                            <% escalas.forEach(escala => { %>
+
+                                                <option
+                                                    value="<%= escala.id %>"
+                                                    <%= Number(escalaMotorista.escala.id) === Number(escala.id) ? 'selected' : '' %>
+                                                >
+                                                    <%= escala.descricao %>
+                                                    <% if (escala.turno) { %>
+                                                        - <%= escala.turno %>
+                                                    <% } %>
+                                                </option>
+
+                                            <% }) %>
+
+                                        <% } %>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- INÍCIO -->
+                                <div class="col-12 col-md-6">
+
+                                    <label
+                                        for="horario_inicio"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Data e horário de início
+                                    </label>
+
+                                    <input
+                                        type="datetime-local"
+                                        name="horario_inicio"
+                                        id="horario_inicio"
+                                        class="form-control"
+                                        value="<%= formatarDataLocal(escalaMotorista.horario_inicio) %>"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <!-- FIM -->
+                                <div class="col-12 col-md-6">
+
+                                    <label
+                                        for="horario_fim"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Data e horário de término
+                                    </label>
+
+                                    <input
+                                        type="datetime-local"
+                                        name="horario_fim"
+                                        id="horario_fim"
+                                        class="form-control"
+                                        value="<%= formatarDataLocal(escalaMotorista.horario_fim) %>"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+                            <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+
+                                <a
+                                    href="/escalamotorista/listar"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    Cancelar
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger"
+                                >
+                                    Atualizar escala
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <script>
+
+        const form =
+            document.getElementById("formEditarEscalaMotorista");
+
+        form.addEventListener("submit", function (event) {
+
+            const inicio =
+                document.getElementById("horario_inicio").value;
+
+            const fim =
+                document.getElementById("horario_fim").value;
+
+            if (!inicio || !fim) {
+                return;
+            }
+
+            const dataInicio = new Date(inicio);
+            const dataFim = new Date(fim);
+
+            if (dataFim <= dataInicio) {
+
+                event.preventDefault();
+
+                alert(
+                    "O horário de término deve ser posterior ao horário de início."
+                );
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

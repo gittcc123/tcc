@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="perfil-body">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4 perfil-container">
+
+                <!-- CABEÇALHO -->
+                <div class="page-header mb-4">
+
+                    <div>
+                        
+
+                        <h1 class="page-title">
+                            Meu Perfil
+                        </h1>
+
+                        <p class="page-subtitle">
+                            Visualize e atualize suas informações pessoais.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- MENSAGEM -->
+                <% if (mensagem) { %>
+
+                    <div
+                        class="alert <%= mensagem.tipo === 'success'
+                            ? 'alert-success'
+                            : 'alert-danger' %> alert-dismissible fade show"
+                        role="alert"
+                    >
+
+                        <strong>
+                            <%= mensagem.titulo %>
+                        </strong>
+
+                        <div>
+                            <%= mensagem.valor %>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Fechar"
+                        ></button>
+
+                    </div>
+
+                <% } %>
+
+
+                <!-- CARD PRINCIPAL -->
+                <div class="perfil-card">
+
+                    <div class="perfil-card-header">
+
+                        <div>
+                            <h2>
+                                Informações do perfil
+                            </h2>
+
+                            <p>
+                                Atualize seus dados e sua foto de perfil.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="perfil-card-body">
+
+                        <!-- FOTO -->
+                        <div class="foto-area">
+
+                            <div class="foto-wrapper">
+
+                                <img
+                                    id="imagemPerfil"
+                                    src="/foto/<%= usuario.id %>?v=<%= Date.now() %>"
+                                    alt="Foto de perfil"
+                                    class="foto-perfil"
+                                    onload="mostrarFoto()"
+                                    onerror="mostrarInicial()"
+                                >
+
+                                <div
+                                    id="fotoInicial"
+                                    class="foto-inicial"
+                                >
+                                    <%= usuarioPerfil.nome
+                                        ? usuarioPerfil.nome
+                                            .charAt(0)
+                                            .toUpperCase()
+                                        : "U" %>
+                                </div>
+
+                            </div>
+
+
+                            <div class="foto-info">
+
+                                <h3>
+                                    Foto de perfil
+                                </h3>
+
+                                <p>
+                                    Escolha uma imagem JPG, JPEG, PNG ou WEBP.
+                                </p>
+
+                                <p class="foto-limite">
+                                    Tamanho máximo: 5 MB.
+                                </p>
+
+
+                                <div class="foto-botoes">
+
+                                    <!-- ALTERAR FOTO -->
+                                    <label
+                                        for="inputFoto"
+                                        class="btn btn-foto"
+                                    >
+                                        <i class="bi bi-camera me-2"></i>
+                                        Escolher foto
+                                    </label>
+
+
+                                    <!-- EXCLUIR FOTO -->
+                                    <form
+                                        id="formExcluirFoto"
+                                        action="/usuario/perfil/foto/excluir"
+                                        method="POST"
+                                        onsubmit="return confirmarExclusaoFoto();"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            id="btnExcluirFoto"
+                                            class="btn btn-excluir-foto"
+                                            style="display: none;"
+                                        >
+                                            <i class="bi bi-trash me-2"></i>
+                                            Excluir foto
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+
+                                <div
+                                    id="nomeArquivo"
+                                    class="nome-arquivo"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <hr class="perfil-divider">
+
+
+                        <!-- FORMULÁRIO -->
+                        <form
+                            id="formPerfil"
+                            action="/usuario/perfil"
+                            method="POST"
+                            enctype="multipart/form-data"
+                        >
+
+                            <input
+                                type="file"
+                                id="inputFoto"
+                                name="foto"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                hidden
+                            >
+
+
+                            <!-- DADOS -->
+                            <div class="dados-grid">
+
+                                <!-- NOME -->
+                                <div class="campo">
+
+                                    <label for="nome">
+                                        Nome
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-person"></i>
+
+                                        <input
+                                            type="text"
+                                            id="nome"
+                                            name="nome"
+                                            value="<%= usuarioPerfil.nome %>"
+                                            maxlength="60"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- EMAIL -->
+                                <div class="campo">
+
+                                    <label for="email">
+                                        E-mail
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-envelope"></i>
+
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            value="<%= usuarioPerfil.email %>"
+                                            maxlength="255"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- SENHA -->
+                                <div class="campo campo-senha">
+
+                                    <label for="senha">
+                                        Nova senha
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-lock"></i>
+
+                                        <input
+                                            type="password"
+                                            id="senha"
+                                            name="senha"
+                                            placeholder="Digite somente se quiser alterar"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            class="btn-mostrar-senha"
+                                            onclick="mostrarSenha()"
+                                            aria-label="Mostrar senha"
+                                        >
+                                            <i
+                                                id="iconeSenha"
+                                                class="bi bi-eye"
+                                            ></i>
+                                        </button>
+
+                                    </div>
+
+                                    <small>
+                                        Deixe em branco para manter a senha atual.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- TIPO -->
+                                <div class="campo">
+
+                                    <label>
+                                        Tipo de usuário
+                                    </label>
+
+                                    <div class="tipo-box">
+
+                                        <i class="bi bi-person-badge"></i>
+
+                                        <span>
+                                            <%= usuarioPerfil.tipo.nome %>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+                            <div class="acoes-perfil">
+
+                                <a
+                                    href="/dashboard"
+                                    class="btn btn-voltar"
+                                >
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Voltar
+                                </a>
+
+
+                                <button
+                                    type="submit"
+                                    id="btnSalvar"
+                                    class="btn btn-salvar"
+                                >
+                                    <i
+                                        id="iconeSalvar"
+                                        class="bi bi-check-lg me-2"
+                                    ></i>
+
+                                    <span id="textoSalvar">
+                                        Salvar alterações
+                                    </span>
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body.perfil-body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+
+        .perfil-container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+
+        /* CABEÇALHO */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+
+        .page-kicker {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            color: #991f1f;
+            margin-bottom: 5px;
+        }
+
+
+        .page-title {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #222;
+        }
+
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #6c757d;
+            font-size: 15px;
+        }
+
+
+        /* CARD */
+
+        .perfil-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
+            overflow: hidden;
+        }
+
+
+        .perfil-card-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+
+        .perfil-card-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #222;
+        }
+
+
+        .perfil-card-header p {
+            margin: 6px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        .perfil-card-body {
+            padding: 30px;
+        }
+
+
+        /* FOTO */
+
+        .foto-area {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+
+        .foto-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            min-width: 140px;
+        }
+
+
+        .foto-perfil,
+        .foto-inicial {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f1f1f1;
+        }
+
+
+        .foto-inicial {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: #991f1f;
+            color: #fff;
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+
+        .foto-info {
+            flex: 1;
+        }
+
+
+        .foto-info h3 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+
+        .foto-info p {
+            margin: 0 0 4px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+
+        .foto-limite {
+            font-size: 13px !important;
+            margin-bottom: 16px !important;
+        }
+
+
+        .foto-botoes {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+
+        .btn-foto {
+            background: #991f1f;
+            border: 1px solid #991f1f;
+            color: #fff;
+            cursor: pointer;
+        }
+
+
+        .btn-foto:hover {
+            background: #7a1f1f;
+            border-color: #7a1f1f;
+            color: #fff;
+        }
+
+
+        .btn-excluir-foto {
+            border: 1px solid #b5b5b5;
+            background: #fff;
+            color: #555;
+        }
+
+
+        .btn-excluir-foto:hover {
+            background: #f1f1f1;
+            color: #222;
+        }
+
+
+        .nome-arquivo {
+            margin-top: 9px;
+            font-size: 13px;
+            color: #555;
+            min-height: 18px;
+        }
+
+
+        .perfil-divider {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #eeeeee;
+        }
+
+
+        /* CAMPOS */
+
+        .dados-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+
+        .campo {
+            min-width: 0;
+        }
+
+
+        .campo label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+
+        .input-wrapper > i {
+            position: absolute;
+            left: 14px;
+            color: #8a8a8a;
+            font-size: 17px;
+            z-index: 2;
+        }
+
+
+        .input-wrapper input {
+            width: 100%;
+            height: 46px;
+            border: 1px solid #d8d8d8;
+            border-radius: 8px;
+            padding: 0 14px 0 43px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            background: #fff;
+            transition: .2s;
+        }
+
+
+        .input-wrapper input:focus {
+            border-color: #991f1f;
+            box-shadow: 0 0 0 3px rgba(153, 31, 31, .08);
+        }
+
+
+        .campo small {
+            display: block;
+            margin-top: 7px;
+            color: #888;
+            font-size: 12px;
+        }
+
+
+        .btn-mostrar-senha {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            width: 36px;
+            height: 36px;
+            border: 0;
+            background: transparent;
+            color: #777;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        .btn-mostrar-senha:hover {
+            background: #f2f2f2;
+        }
+
+
+        .tipo-box {
+            height: 46px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #d8d8d8;
+            border-radius: 8px;
+            padding: 0 14px;
+            background: #f8f8f8;
+            color: #555;
+            font-size: 14px;
+        }
+
+
+        .tipo-box i {
+            color: #991f1f;
+            font-size: 17px;
+        }
+
+
+        /* AÇÕES */
+
+        .acoes-perfil {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 24px;
+            border-top: 1px solid #eeeeee;
+        }
+
+
+        .btn {
+            min-height: 42px;
+            padding: 9px 17px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+
+        .btn-voltar {
+            background: #fff;
+            border: 1px solid #d2d2d2;
+            color: #555;
+        }
+
+
+        .btn-voltar:hover {
+            background: #f2f2f2;
+            color: #333;
+        }
+
+
+        .btn-salvar {
+            background: #991f1f;
+            border: 1px solid #991f1f;
+            color: #fff;
+        }
+
+
+        .btn-salvar:hover {
+            background: #7a1f1f;
+            border-color: #7a1f1f;
+            color: #fff;
+        }
+
+
+        .btn-salvar:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+
+        /* RESPONSIVO */
+
+        @media (max-width: 768px) {
+
+            .perfil-container {
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+
+
+            .page-title {
+                font-size: 25px;
+            }
+
+
+            .perfil-card-body {
+                padding: 22px;
+            }
+
+
+            .foto-area {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+
+            .foto-info {
+                width: 100%;
+            }
+
+
+            .foto-botoes {
+                justify-content: center;
+            }
+
+
+            .dados-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+
+            .acoes-perfil {
+                gap: 12px;
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+
+            .acoes-perfil .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+
+        @media (max-width: 480px) {
+
+            .perfil-card-header {
+                padding: 20px;
+            }
+
+
+            .perfil-card-body {
+                padding: 18px;
+            }
+
+
+            .foto-wrapper,
+            .foto-perfil,
+            .foto-inicial {
+                width: 120px;
+                height: 120px;
+            }
+
+
+            .foto-inicial {
+                font-size: 40px;
+            }
+
+        }
+
+    </style>
+ <%- include('../../partials/scripts') %>
+
+    <script>
+
+        const inputFoto = document.getElementById("inputFoto");
+        const nomeArquivo = document.getElementById("nomeArquivo");
+        const imagemPerfil = document.getElementById("imagemPerfil");
+        const fotoInicial = document.getElementById("fotoInicial");
+        const btnExcluirFoto = document.getElementById("btnExcluirFoto");
+        const formPerfil = document.getElementById("formPerfil");
+        const btnSalvar = document.getElementById("btnSalvar");
+        const textoSalvar = document.getElementById("textoSalvar");
+
+
+        /*
+         * QUANDO EXISTE FOTO
+         */
+        function mostrarFoto() {
+
+            imagemPerfil.style.display = "block";
+
+            fotoInicial.style.display = "none";
+
+            btnExcluirFoto.style.display = "inline-block";
+        }
+
+
+        /*
+         * QUANDO NÃO EXISTE FOTO
+         */
+        function mostrarInicial() {
+
+            imagemPerfil.style.display = "none";
+
+            fotoInicial.style.display = "flex";
+
+            btnExcluirFoto.style.display = "none";
+        }
+
+
+        /*
+         * ESCOLHER NOVA FOTO
+         */
+        inputFoto.addEventListener("change", function () {
+
+            const arquivo = this.files[0];
+
+            if (!arquivo) {
+                return;
+            }
+
+
+            const tiposPermitidos = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/webp"
+            ];
+
+
+            /*
+             * VERIFICA TIPO
+             */
+            if (!tiposPermitidos.includes(arquivo.type)) {
+
+                alert(
+                    "Formato inválido.\n\n" +
+                    "Escolha uma imagem JPG, JPEG, PNG ou WEBP."
+                );
+
+                this.value = "";
+
+                nomeArquivo.textContent = "";
+
+                return;
+            }
+
+
+            /*
+             * VERIFICA TAMANHO
+             */
+            const limite = 5 * 1024 * 1024;
+
+            if (arquivo.size > limite) {
+
+                alert(
+                    "A foto não pode ter mais de 5 MB."
+                );
+
+                this.value = "";
+
+                nomeArquivo.textContent = "";
+
+                return;
+            }
+
+
+            /*
+             * MOSTRA NOME
+             */
+            nomeArquivo.textContent =
+                "Arquivo selecionado: " + arquivo.name;
+
+
+            /*
+             * MOSTRA PRÉVIA
+             */
+            const leitor = new FileReader();
+
+            leitor.onload = function (evento) {
+
+                imagemPerfil.src = evento.target.result;
+
+                imagemPerfil.style.display = "block";
+
+                fotoInicial.style.display = "none";
+
+                btnExcluirFoto.style.display = "none";
+            };
+
+
+            leitor.readAsDataURL(arquivo);
+
+        });
+
+
+        /*
+         * CONFIRMAR EXCLUSÃO
+         */
+        function confirmarExclusaoFoto() {
+
+            return confirm(
+                "Deseja realmente excluir sua foto de perfil?"
+            );
+        }
+
+
+        /*
+         * MOSTRAR / ESCONDER SENHA
+         */
+        function mostrarSenha() {
+
+            const senha = document.getElementById("senha");
+
+            const icone = document.getElementById("iconeSenha");
+
+
+            if (senha.type === "password") {
+
+                senha.type = "text";
+
+                icone.className = "bi bi-eye-slash";
+
+            } else {
+
+                senha.type = "password";
+
+                icone.className = "bi bi-eye";
+            }
+        }
+
+
+        /*
+         * ENVIO DO FORMULÁRIO
+         */
+        formPerfil.addEventListener("submit", function () {
+
+            btnSalvar.disabled = true;
+
+            textoSalvar.textContent = "Salvando...";
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

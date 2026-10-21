@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <div class="mb-4">
+
+                    <h1 class="fw-bold mb-1">
+                        Editar Ponto
+                    </h1>
+
+                    <p class="text-muted mb-0">
+                        Atualize as informações do ponto monitorado.
+                    </p>
+
+                </div>
+
+
+                <div class="card border-0 shadow-sm cadastro-card">
+
+                    <div class="card-body p-4">
+
+                        <form
+                            action="/ponto/editar/<%= ponto.id %>"
+                            method="POST"
+                        >
+
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-semibold">
+                                        Localização
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="localizacao"
+                                        class="form-control"
+                                        value="<%= ponto.localizacao %>"
+                                        maxlength="200"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-semibold">
+                                        Cidade
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="cidade"
+                                        class="form-control"
+                                        value="<%= ponto.cidade %>"
+                                        min="1"
+                                        required
+                                    >
+
+                                    <% if (ponto.nomeCidade) { %>
+
+                                        <small class="text-muted">
+                                            Cidade atual:
+                                            <%= ponto.nomeCidade %>
+                                        </small>
+
+                                    <% } %>
+
+                                </div>
+
+
+                                <div class="col-12">
+
+                                    <label class="form-label fw-semibold">
+                                        Descrição
+                                    </label>
+
+                                    <textarea
+                                        name="descricao"
+                                        class="form-control"
+                                        rows="3"
+                                        maxlength="200"
+                                        required
+                                    ><%= ponto.descricao %></textarea>
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-semibold">
+                                        Latitude
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="latitude"
+                                        class="form-control"
+                                        step="any"
+                                        value="<%= ponto.latitude %>"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-semibold">
+                                        Longitude
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="longitude"
+                                        class="form-control"
+                                        step="any"
+                                        value="<%= ponto.longitude %>"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="col-12 d-flex gap-2 justify-content-end">
+
+                                    <a
+                                        href="/ponto/listar"
+                                        class="btn btn-outline-secondary px-4"
+                                    >
+                                        Cancelar
+                                    </a>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger px-4"
+                                    >
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Salvar Alterações
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+
+        .cadastro-card {
+            border-radius: 14px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus {
+            border-color: #8b2e2e;
+            box-shadow: 0 0 0 .2rem rgba(139,46,46,.12);
+        }
+
+        .btn {
+            border-radius: 8px;
+        }
+
+        .btn-danger {
+            background: #8b2e2e;
+            border-color: #8b2e2e;
+        }
+
+        .btn-danger:hover {
+            background: #6f2323;
+            border-color: #6f2323;
+        }
+
+    </style>
+
+
+    <% if (mensagem) { %>
+
+        <script>
+
+            Swal.fire({
+
+                icon: '<%= mensagem.tipo %>',
+
+                title: '<%= mensagem.tituloMensagem || mensagem.titulo || "" %>',
+
+                text: '<%= mensagem.valor %>',
+
+                confirmButtonColor: '#8b2e2e'
+
+            });
+
+        </script>
+
+    <% } %>
+
+</body>
+
+</html>

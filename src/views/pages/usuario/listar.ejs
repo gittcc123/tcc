@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <!-- CABEÇALHO -->
+                <div class="page-header mb-4">
+
+                    <div>
+                        <h1 class="fw-bold mb-1">
+                            Usuários Cadastrados
+                        </h1>
+
+                        <p class="mb-0">
+                            Consulte e gerencie os usuários cadastrados no sistema.
+                        </p>
+                    </div>
+
+                    <a href="/admin/usuario/cadastrar"
+                        class="btn btn-light btn-cadastrar">
+                        Cadastrar Usuário
+                    </a>
+
+                </div>
+
+
+                <!-- USUÁRIOS -->
+                <div class="row g-4">
+
+                    <% if (usuarios && usuarios.length > 0) { %>
+
+                        <% usuarios.forEach((usuario, i) => { %>
+
+                            <div class="col-12 col-md-6 col-xl-4">
+
+                                <div class="card usuario-card h-100 border-0 shadow-sm">
+
+                                    <div class="card-body p-4">
+
+                                        <!-- CABEÇALHO DO CARD -->
+                                        <div class="d-flex align-items-center mb-4">
+
+                                            <div class="usuario-icon">
+
+                                                <img
+                                                    src="/foto/<%= usuario.id %>"
+                                                    alt="Foto de <%= usuario.nome %>"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                                >
+
+                                                <i
+                                                    class="bi bi-person-fill"
+                                                    style="display: none;">
+                                                </i>
+
+                                            </div>
+
+                                            <div class="ms-3">
+
+                                                <h5 class="fw-bold mb-1">
+                                                    <%= usuario.nome %>
+                                                </h5>
+
+                                                <small class="text-muted">
+                                                    Usuário #<%= i + 1 %>
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- EMAIL -->
+                                        <div class="info-item">
+
+                                            <div class="info-icon">
+                                                <i class="bi bi-envelope"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <small>
+                                                    Email
+                                                </small>
+
+                                                <p class="mb-0">
+                                                    <%= usuario.email %>
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- TIPO -->
+                                        <div class="info-item">
+
+                                            <div class="info-icon">
+                                                <i class="bi bi-person-badge"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <small>
+                                                    Tipo de usuário
+                                                </small>
+
+                                                <p class="mb-0">
+
+                                                    <span class="tipo-badge">
+                                                        <%= usuario.tipo.nome %>
+                                                    </span>
+
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+
+
+
+                                        <!-- AÇÕES -->
+                                        <div class="acoes mt-4">
+
+                                            <a
+                                                href="/usuario/editar/<%= usuario.id %>"
+                                                class="btn btn-outline-primary flex-grow-1">
+
+                                                <i class="bi bi-pencil me-1"></i>
+                                                Editar
+
+                                            </a>
+
+
+                                            <form
+                                                class="form-excluir flex-grow-1"
+                                                action="/usuario/excluir/<%= usuario.id %>"
+                                                method="post">
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-outline-danger w-100">
+
+                                                    <i class="bi bi-trash me-1"></i>
+                                                    Excluir
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        <% }) %>
+
+                    <% } else { %>
+
+                        <!-- NENHUM USUÁRIO -->
+                        <div class="col-12">
+
+                            <div class="card border-0 shadow-sm">
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+
+                                    <h4>
+                                        Nenhum usuário cadastrado
+                                    </h4>
+
+                                    <p>
+                                        Ainda não existem usuários cadastrados no sistema.
+                                    </p>
+
+                                    <a
+                                        href="/admin/usuario/cadastrar"
+                                        class="btn btn-danger px-4">
+
+                                        Cadastrar Usuário
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <!-- SWEETALERT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+
+        const formsExcluir =
+            document.getElementsByClassName('form-excluir');
+
+
+        for (const formExcluir of formsExcluir) {
+
+            formExcluir.addEventListener('submit', (e) => {
+
+                e.preventDefault();
+
+                Swal.fire({
+
+                    title: 'Deseja realmente excluir?',
+
+                    text: 'Esta ação não poderá ser desfeita.',
+
+                    icon: 'warning',
+
+                    showCancelButton: true,
+
+                    confirmButtonText: 'Sim, excluir',
+
+                    cancelButtonText: 'Cancelar',
+
+                    confirmButtonColor: '#8b2e2e',
+
+                    cancelButtonColor: '#6c757d',
+
+                    reverseButtons: true
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        formExcluir.submit();
+
+                    }
+
+                });
+
+            });
+
+        }
+
+    </script>
+
+
+    <!-- MENSAGEM -->
+    <% if (mensagem) { %>
+
+        <script>
+
+            Swal.fire({
+
+                icon: '<%= mensagem.tipo %>',
+
+                title:
+                    '<%= mensagem.tituloMensagem || "Aviso" %>',
+
+                text:
+                    '<%= mensagem.valor %>',
+
+                confirmButtonColor: '#8b2e2e',
+
+                confirmButtonText: 'OK'
+
+            });
+
+        </script>
+
+    <% } %>
+
+
+    <style>
+
+        .content {
+            min-height: 100vh;
+        }
+
+
+        /* CABEÇALHO */
+
+        .page-header {
+
+            background: linear-gradient(
+                135deg,
+                #dc3545,
+                #b02a37
+            );
+
+            color: white;
+
+            border-radius: 14px;
+
+            padding: 25px 30px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow:
+                0 5px 18px rgba(220, 53, 69, .18);
+        }
+
+
+        .page-header p {
+            opacity: .9;
+        }
+
+
+        .btn-cadastrar {
+
+            color: #dc3545;
+
+            font-weight: 600;
+
+            border-radius: 9px;
+
+            padding: 10px 18px;
+
+            white-space: nowrap;
+        }
+
+
+        .btn-cadastrar:hover {
+            color: #b02a37;
+        }
+
+
+        /* CARD */
+
+        .usuario-card {
+
+            border-radius: 14px;
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+
+        }
+
+
+        .usuario-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .10) !important;
+
+        }
+
+
+        /* FOTO */
+
+        .usuario-icon {
+
+            width: 58px;
+
+            height: 58px;
+
+            min-width: 58px;
+
+            border-radius: 50%;
+
+            background: #f8d7da;
+
+            color: #8b2e2e;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 23px;
+
+            overflow: hidden;
+
+            border: 2px solid #f1c5c9;
+
+        }
+
+
+        .usuario-icon img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+
+        }
+
+
+        .usuario-icon i {
+
+            width: 100%;
+
+            height: 100%;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+        /* INFORMAÇÕES */
+
+        .info-item {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 12px;
+
+            margin-bottom: 10px;
+
+            background: #f8f9fa;
+
+            border-radius: 10px;
+
+        }
+
+
+        .info-icon {
+
+            width: 36px;
+
+            height: 36px;
+
+            min-width: 36px;
+
+            border-radius: 9px;
+
+            background: white;
+
+            color: #8b2e2e;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+        .info-item small {
+
+            display: block;
+
+            color: #6c757d;
+
+            font-size: 12px;
+
+            margin-bottom: 2px;
+
+        }
+
+
+        .info-item p {
+
+            color: #343a40;
+
+            font-size: 14px;
+
+            word-break: break-word;
+
+        }
+
+
+        /* TIPO */
+
+        .tipo-badge {
+
+            display: inline-block;
+
+            background: #e9ecef;
+
+            color: #495057;
+
+            border-radius: 7px;
+
+            padding: 4px 9px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* AÇÕES */
+
+        .acoes {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+
+        .acoes .btn {
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+        }
+
+
+        /* ESTADO VAZIO */
+
+        .empty-state {
+
+            text-align: center;
+
+            padding: 60px 20px;
+
+        }
+
+
+        .empty-icon {
+
+            width: 70px;
+
+            height: 70px;
+
+            margin: 0 auto 18px;
+
+            border-radius: 50%;
+
+            background: #f8d7da;
+
+            color: #8b2e2e;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 30px;
+
+        }
+
+
+        .empty-state h4 {
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .empty-state p {
+
+            color: #6c757d;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        /* RESPONSIVO */
+
+        @media (max-width: 768px) {
+
+            .page-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 18px;
+
+                padding: 20px;
+
+            }
+
+
+            .btn-cadastrar {
+
+                width: 100%;
+
+                text-align: center;
+
+            }
+
+
+            .acoes {
+
+                flex-direction: column;
+
+            }
+
+
+            .acoes .btn {
+
+                width: 100%;
+
+            }
+
+        }
+
+    </style>
+
+
+</body>
+
+</html>

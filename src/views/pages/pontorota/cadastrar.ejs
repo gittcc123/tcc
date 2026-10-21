@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <div
+                    class="card border-0 shadow-sm mx-auto"
+                    style="max-width: 700px; border-radius: 15px;">
+
+                    <!-- CABEÇALHO -->
+
+                    <div
+                        class="card-header text-white border-0"
+                        style="
+                            background:#992d2d;
+                            padding:25px 30px;
+                        ">
+
+                        <h2 class="mb-1 fw-bold">
+
+                            <i class="bi bi-signpost-2 me-2"></i>
+
+                            Associar Ponto à Rota
+
+                        </h2>
+
+                        <p class="mb-0 opacity-75">
+
+                            Relacione um ponto a uma rota do transporte.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- FORM -->
+
+                    <form
+                        action="/pontoRota/cadastrar"
+                        method="POST">
+
+                        <div class="card-body p-4 p-md-5">
+
+                            <% if (mensagem) { %>
+
+                                <div class="alert alert-danger">
+
+                                    <strong>
+                                        <%= mensagem.titulo %>
+                                    </strong>
+
+                                    <br>
+
+                                    <%= mensagem.valor %>
+
+                                </div>
+
+                            <% } %>
+
+
+                            <!-- ROTA -->
+
+                            <div class="mb-4">
+
+                                <label
+                                    for="rota_id"
+                                    class="form-label fw-semibold">
+
+                                    Rota
+
+                                </label>
+
+                                <select
+                                    id="rota_id"
+                                    name="rota_id"
+                                    class="form-select form-select-lg"
+                                    required>
+
+                                    <option value="">
+                                        Selecione a rota
+                                    </option>
+
+                                    <% if (rotas && rotas.length > 0) { %>
+
+                                        <% rotas.forEach(rota => { %>
+
+                                            <option
+                                                value="<%= rota.id %>">
+
+                                                <%= rota.descricao %>
+
+                                            </option>
+
+                                        <% }) %>
+
+                                    <% } %>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- PONTO -->
+
+                            <div class="mb-4">
+
+                                <label
+                                    for="ponto_id"
+                                    class="form-label fw-semibold">
+
+                                    Ponto
+
+                                </label>
+
+                                <select
+                                    id="ponto_id"
+                                    name="ponto_id"
+                                    class="form-select form-select-lg"
+                                    required>
+
+                                    <option value="">
+                                        Selecione o ponto
+                                    </option>
+
+                                    <% if (pontos && pontos.length > 0) { %>
+
+                                        <% pontos.forEach(ponto => { %>
+
+                                            <option
+                                                value="<%= ponto.id %>">
+
+                                                <%= ponto.descricao %>
+
+                                                <% if (ponto.localizacao) { %>
+
+                                                    - <%= ponto.localizacao %>
+
+                                                <% } %>
+
+                                            </option>
+
+                                        <% }) %>
+
+                                    <% } %>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- RODAPÉ -->
+
+                        <div
+                            class="card-footer bg-white border-top p-4 d-flex justify-content-between">
+
+                            <a
+                                href="/pontoRota/listar"
+                                class="btn btn-outline-secondary">
+
+                                <i class="bi bi-arrow-left me-1"></i>
+
+                                Voltar
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn text-white px-4"
+                                style="background:#992d2d;">
+
+                                <i class="bi bi-check-lg me-1"></i>
+
+                                Salvar associação
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar Localização</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.container{
+    width:500px;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#992d2d;
+    margin-bottom:25px;
+}
+
+.campo{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:bold;
+    color:#444;
+}
+
+input,
+select{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:15px;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#992d2d;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#992d2d;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#7d2323;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>Editar Localização</h1>
+
+<form>
+
+<div class="campo">
+<label>Veículo</label>
+
+<select>
+<option>Ônibus 100</option>
+<option selected>Ônibus 101</option>
+<option>Ônibus 102</option>
+</select>
+
+</div>
+
+<div class="campo">
+<label>Latitude</label>
+<input type="text" value="-23.550520">
+</div>
+
+<div class="campo">
+<label>Longitude</label>
+<input type="text" value="-46.633308">
+</div>
+
+<div class="campo">
+<label>Data/Hora</label>
+<input type="datetime-local" value="2025-09-01T08:30">
+</div>
+
+<button type="submit">
+Atualizar Localização
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
+
