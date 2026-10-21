@@ -1,4 +1,4 @@
-import { connection } from "../infra/Connection";
+import { connection } from "../Infra/Connection";
 
 export class TipoUsuario {
     id: number;
