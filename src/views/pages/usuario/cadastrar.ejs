@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <!-- CABEÇALHO -->
+                <div class="page-header mb-4">
+                    <div>
+                        <h1>
+                            <i class="bi bi-person-plus-fill"></i>
+                            <%= titulo %>
+                        </h1>
+                        <p>
+                            Cadastre um novo usuário no sistema
+                        </p>
+                    </div>
+
+                    
+                </div>
+
+                <!-- FORMULÁRIO -->
+                <div class="card cadastro-card border-0 shadow-sm">
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="form-section-title">
+                            <div class="section-icon">
+                                <i class="bi bi-person-vcard"></i>
+                            </div>
+
+                            <div>
+                                <h5>Dados do usuário</h5>
+                                <span>Preencha as informações abaixo para realizar o cadastro.</span>
+                            </div>
+                        </div>
+
+                        <form action="/admin/usuario/cadastrar" method="POST">
+
+                            <div class="row g-4">
+
+                                <!-- NOME -->
+                                <div class="col-lg-6 col-12">
+                                    <label for="nome" class="form-label">
+                                        Nome
+                                    </label>
+
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-person"></i>
+
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="nome"
+                                            name="nome"
+                                            placeholder="Digite o nome completo"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <!-- EMAIL -->
+                                <div class="col-lg-6 col-12">
+                                    <label for="email" class="form-label">
+                                        E-mail
+                                    </label>
+
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-envelope"></i>
+
+                                        <input
+                                            type="email"
+                                            class="form-control"
+                                            id="email"
+                                            name="email"
+                                            placeholder="Digite o e-mail"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <!-- SENHA -->
+                                <div class="col-lg-6 col-12">
+                                    <label for="senha" class="form-label">
+                                        Senha
+                                    </label>
+
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-lock"></i>
+
+                                        <input
+                                            type="password"
+                                            class="form-control"
+                                            id="senha"
+                                            name="senha"
+                                            placeholder="Digite a senha"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <!-- TIPO -->
+                                <div class="col-lg-6 col-12">
+                                    <label for="tipo" class="form-label">
+                                        Tipo de Usuário
+                                    </label>
+
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-person-badge"></i>
+
+                                        <select
+                                            name="tipo"
+                                            id="tipo"
+                                            class="form-select"
+                                            required>
+
+                                            <option value="USUARIO">
+                                                Usuário
+                                            </option>
+
+                                            <option value="MOTORISTA">
+                                                Motorista
+                                            </option>
+
+                                            <option value="ADMIN">
+                                                Administrador
+                                            </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- DIVISOR -->
+                            <hr class="my-5">
+
+                            <!-- BOTÕES -->
+                            <div class="d-flex justify-content-end gap-2">
+
+                                <a
+                                    href="/usuario/listar"
+                                    class="btn btn-outline-secondary btn-action">
+
+                                    <i class="bi bi-x-lg"></i>
+                                    Cancelar
+
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-cadastrar btn-action">
+
+                                    <i class="bi bi-check-lg"></i>
+                                    Cadastrar Usuário
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <%- include('../../partials/scripts') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+
+        .content {
+            min-height: calc(100vh - 60px);
+        }
+
+        /* CABEÇALHO */
+
+        .page-header {
+            background: linear-gradient(
+                135deg,
+                #7a1f1f,
+                #a52a2a
+            );
+
+            border-radius: 14px;
+
+            padding: 28px 32px;
+
+            color: white;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-header h1 {
+            margin: 0;
+
+            font-size: 26px;
+
+            font-weight: 700;
+        }
+
+        .page-header h1 i {
+            margin-right: 8px;
+        }
+
+        .page-header p {
+            margin: 6px 0 0;
+
+            opacity: 0.85;
+
+            font-size: 14px;
+        }
+
+        .btn-voltar {
+            border: none;
+
+            font-weight: 600;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            white-space: nowrap;
+        }
+
+        /* CARD */
+
+        .cadastro-card {
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            background: #ffffff;
+        }
+
+        /* TÍTULO DA SEÇÃO */
+
+        .form-section-title {
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 35px;
+        }
+
+        .section-icon {
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 10px;
+
+            background: #f8eaea;
+
+            color: #8b2e2e;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 21px;
+        }
+
+        .form-section-title h5 {
+            margin: 0;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color: #343a40;
+        }
+
+        .form-section-title span {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #7b8187;
+
+            font-size: 13px;
+        }
+
+        /* LABEL */
+
+        .form-label {
+            font-weight: 600;
+
+            color: #343a40;
+
+            margin-bottom: 8px;
+        }
+
+        /* INPUTS */
+
+        .input-group-custom {
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+        }
+
+        .input-group-custom > i {
+            position: absolute;
+
+            left: 14px;
+
+            color: #8b2e2e;
+
+            z-index: 2;
+
+            font-size: 16px;
+        }
+
+        .input-group-custom .form-control,
+        .input-group-custom .form-select {
+            min-height: 46px;
+
+            padding-left: 42px;
+
+            border: 1px solid #dee2e6;
+
+            border-radius: 9px;
+
+            box-shadow: none;
+
+            transition: all 0.2s ease;
+        }
+
+        .input-group-custom .form-control:focus,
+        .input-group-custom .form-select:focus {
+            border-color: #a52a2a;
+
+            box-shadow: 0 0 0 3px rgba(165, 42, 42, 0.10);
+        }
+
+        .input-group-custom .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        /* BOTÕES */
+
+        .btn-action {
+            min-height: 44px;
+
+            padding: 10px 20px;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+        .btn-cadastrar {
+            background: #8b2e2e;
+
+            color: white;
+
+            border: 1px solid #8b2e2e;
+        }
+
+        .btn-cadastrar:hover {
+            background: #7a1f1f;
+
+            border-color: #7a1f1f;
+
+            color: white;
+        }
+
+        /* RESPONSIVO */
+
+        @media (max-width: 768px) {
+
+            .page-header {
+                padding: 22px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            .btn-voltar {
+                width: 100%;
+            }
+
+            .cadastro-card .card-body {
+                padding: 25px !important;
+            }
+
+            .d-flex.justify-content-end {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+    <% if (mensagem) { %>
+
+        <script>
+
+            Swal.fire({
+                icon: '<%= mensagem.tipo %>',
+                title: '<%= mensagem.titulo || "Aviso" %>',
+                text: '<%= mensagem.valor %>',
+                confirmButtonColor: '#8b2e2e',
+                confirmButtonText: 'OK'
+            });
+
+        </script>
+
+    <% } %>
+
+</body>
+
+</html>

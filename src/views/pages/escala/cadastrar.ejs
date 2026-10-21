@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100 escala-page">
+
+            <div class="escala-container">
+
+                <!-- CABEÇALHO -->
+                <div class="topo-pagina">
+
+                    <div>
+
+                        <div class="breadcrumb-page">
+
+                            <a href="/escala/listar">
+                                Escalas
+                            </a>
+
+                            <i class="bi bi-chevron-right"></i>
+
+                            <span>Nova escala</span>
+
+                        </div>
+
+                        <h1>Nova escala</h1>
+
+                        <p>
+                            Cadastre uma nova escala de trabalho.
+                        </p>
+
+                    </div>
+
+                    <a href="/escala/listar" class="btn-voltar">
+
+                        <i class="bi bi-arrow-left"></i>
+
+                        Voltar
+
+                    </a>
+
+                </div>
+
+
+                <!-- MENSAGEM -->
+
+                <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+                    <div class="mensagem
+                        <%= mensagem.tipo === 'success'
+                            ? 'mensagem-sucesso'
+                            : 'mensagem-erro' %>">
+
+                        <div class="mensagem-icone">
+
+                            <i class="bi
+                                <%= mensagem.tipo === 'success'
+                                    ? 'bi-check-circle'
+                                    : 'bi-exclamation-circle' %>">
+                            </i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                <%= mensagem.tituloMensagem || 'Atenção' %>
+                            </strong>
+
+                            <span>
+                                <%= mensagem.valor %>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                <% } %>
+
+
+                <!-- CONTEÚDO -->
+
+                <div class="conteudo-edicao">
+
+                    <!-- LATERAL -->
+
+                    <aside class="info-lateral">
+
+                        <div class="info-titulo">
+
+                            <i class="bi bi-calendar2-plus"></i>
+
+                            <span>Nova escala</span>
+
+                        </div>
+
+                        <div class="novo-titulo">
+                            Cadastro
+                        </div>
+
+                        <p>
+                            Preencha os dados ao lado para
+                            cadastrar uma nova escala no sistema.
+                        </p>
+
+                        <div class="linha-info"></div>
+
+                        <div class="info-item">
+
+                            <span>Descrição</span>
+
+                            <strong>
+                                Identificação da escala
+                            </strong>
+
+                        </div>
+
+                        <div class="info-item">
+
+                            <span>Turno</span>
+
+                            <strong>
+                                Período de trabalho
+                            </strong>
+
+                        </div>
+
+                    </aside>
+
+
+                    <!-- FORMULÁRIO -->
+
+                    <section class="formulario-area">
+
+                        <div class="formulario-header">
+
+                            <div>
+
+                                <h2>Informações da escala</h2>
+
+                                <p>
+                                    Informe os dados necessários para realizar o cadastro.
+                                </p>
+
+                            </div>
+
+                            <span class="status-novo">
+                                Novo cadastro
+                            </span>
+
+                        </div>
+
+
+                        <form
+                            action="/escala/cadastrar"
+                            method="POST"
+                        >
+
+                            <div class="campos">
+
+                                <!-- DESCRIÇÃO -->
+
+                                <div class="campo">
+
+                                    <label for="descricao">
+
+                                        Descrição
+
+                                        <span>
+                                            Obrigatório
+                                        </span>
+
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-card-text"></i>
+
+                                        <input
+                                            type="text"
+                                            id="descricao"
+                                            name="descricao"
+                                            class="custom-input"
+                                            placeholder="Ex.: Escala 6x1"
+                                            maxlength="100"
+                                            autocomplete="off"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <small>
+                                        Nome utilizado para identificar a escala.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- TURNO -->
+
+                                <div class="campo">
+
+                                    <label for="turno">
+
+                                        Turno
+
+                                        <span>
+                                            Obrigatório
+                                        </span>
+
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-clock"></i>
+
+                                        <input
+                                            type="text"
+                                            id="turno"
+                                            name="turno"
+                                            class="custom-input"
+                                            placeholder="Ex.: Manhã"
+                                            maxlength="50"
+                                            autocomplete="off"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <small>
+                                        Ex.: Manhã, Tarde, Noite ou Integral.
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RODAPÉ -->
+
+                            <div class="formulario-footer">
+
+                                <a
+                                    href="/escala/listar"
+                                    class="btn-cancelar"
+                                >
+                                    Cancelar
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="btn-salvar"
+                                >
+
+                                    <i class="bi bi-check2"></i>
+
+                                    Salvar escala
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <%- include('../../partials/scripts') %>
+
+
+<style>
+
+    .escala-page {
+        min-height: calc(100vh - 70px);
+        background: #f6f7f8;
+    }
+
+    .escala-container {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 34px 28px 50px;
+    }
+
+
+    /* CABEÇALHO */
+
+    .topo-pagina {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 28px;
+    }
+
+    .breadcrumb-page {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 9px;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .breadcrumb-page a {
+        color: #8d2929;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .breadcrumb-page i {
+        font-size: 9px;
+        color: #b7b7b7;
+    }
+
+    .topo-pagina h1 {
+        margin: 0;
+        color: #252525;
+        font-size: 29px;
+        font-weight: 700;
+        letter-spacing: -.7px;
+    }
+
+    .topo-pagina p {
+        margin: 6px 0 0;
+        color: #858585;
+        font-size: 14px;
+    }
+
+    .btn-voltar {
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 15px;
+        background: #fff;
+        border: 1px solid #dedede;
+        border-radius: 7px;
+        color: #555;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+    .btn-voltar:hover {
+        color: #8d2929;
+        border-color: #c9a2a2;
+        background: #fff;
+    }
+
+
+    /* MENSAGEM */
+
+    .mensagem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 16px;
+        margin-bottom: 22px;
+        border: 1px solid;
+        border-radius: 7px;
+        background: #fff;
+    }
+
+    .mensagem-icone {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .mensagem-sucesso {
+        border-color: #cfe4d6;
+    }
+
+    .mensagem-sucesso .mensagem-icone {
+        background: #edf8f0;
+        color: #34764a;
+    }
+
+    .mensagem-erro {
+        border-color: #e7cccc;
+    }
+
+    .mensagem-erro .mensagem-icone {
+        background: #fbefef;
+        color: #982c2c;
+    }
+
+    .mensagem strong,
+    .mensagem span {
+        display: block;
+    }
+
+    .mensagem strong {
+        color: #333;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .mensagem span {
+        color: #777;
+        font-size: 12px;
+    }
+
+
+    /* CONTEÚDO */
+
+    .conteudo-edicao {
+        display: grid;
+        grid-template-columns: 245px minmax(0, 1fr);
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-top: 3px solid #922b2b;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+
+    /* LATERAL */
+
+    .info-lateral {
+        padding: 28px 24px;
+        border-right: 1px solid #e8e8e8;
+        background: #fafafa;
+    }
+
+    .info-titulo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #777;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+
+    .info-titulo i {
+        color: #922b2b;
+        font-size: 16px;
+    }
+
+    .novo-titulo {
+        margin-top: 17px;
+        color: #282828;
+        font-size: 27px;
+        font-weight: 750;
+    }
+
+    .info-lateral > p {
+        margin: 7px 0 24px;
+        color: #929292;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .linha-info {
+        height: 1px;
+        margin-bottom: 22px;
+        background: #e4e4e4;
+    }
+
+    .info-item {
+        margin-bottom: 20px;
+    }
+
+    .info-item span {
+        display: block;
+        margin-bottom: 5px;
+        color: #999;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .info-item strong {
+        display: block;
+        color: #3b3b3b;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+
+    /* FORMULÁRIO */
+
+    .formulario-area {
+        min-width: 0;
+        padding: 31px 34px 26px;
+    }
+
+    .formulario-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #ededed;
+    }
+
+    .formulario-header h2 {
+        margin: 0;
+        color: #303030;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .formulario-header p {
+        margin: 5px 0 0;
+        color: #999;
+        font-size: 12px;
+    }
+
+    .status-novo {
+        padding: 5px 10px;
+        border: 1px solid #e6caca;
+        border-radius: 5px;
+        color: #8d2929;
+        background: #fffafa;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+
+
+    /* CAMPOS */
+
+    .campos {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 22px;
+        padding: 29px 0 34px;
+    }
+
+    .campo label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #3e3e3e;
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+    .campo label span {
+        color: #a0a0a0;
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 15px;
+        pointer-events: none;
+        transition: .2s;
+    }
+
+    .custom-input,
+    .input-wrapper input {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px 0 42px;
+        border: 1px solid #d9d9d9;
+        border-radius: 7px;
+        outline: none;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        transition: .2s;
+    }
+
+    .input-wrapper input:hover {
+        border-color: #c5c5c5;
+    }
+
+    .input-wrapper input:focus {
+        border-color: #992d2d;
+        box-shadow: 0 0 0 3px rgba(153, 45, 45, .07);
+    }
+
+    .input-wrapper:focus-within i {
+        color: #992d2d;
+    }
+
+    .campo small {
+        display: block;
+        margin-top: 7px;
+        color: #999;
+        font-size: 11px;
+    }
+
+
+    /* RODAPÉ */
+
+    .formulario-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 20px;
+        border-top: 1px solid #ededed;
+    }
+
+    .btn-cancelar,
+    .btn-salvar {
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 18px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .btn-cancelar {
+        background: #fff;
+        border: 1px solid #d8d8d8;
+        color: #666;
+    }
+
+    .btn-cancelar:hover {
+        background: #f7f7f7;
+        color: #444;
+    }
+
+    .btn-salvar {
+        background: #922b2b;
+        border: 1px solid #922b2b;
+        color: #fff;
+    }
+
+    .btn-salvar:hover {
+        background: #7d2323;
+        border-color: #7d2323;
+        color: #fff;
+    }
+
+
+    /* RESPONSIVO */
+
+    @media (max-width: 900px) {
+
+        .conteudo-edicao {
+            grid-template-columns: 1fr;
+        }
+
+        .info-lateral {
+            border-right: 0;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .campos {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 650px) {
+
+        .escala-container {
+            padding: 24px 15px 35px;
+        }
+
+        .topo-pagina {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .btn-voltar {
+            justify-content: center;
+        }
+
+        .topo-pagina h1 {
+            font-size: 25px;
+        }
+
+        .formulario-area {
+            padding: 25px 19px 21px;
+        }
+
+        .info-lateral {
+            padding: 23px 19px;
+        }
+
+        .formulario-header {
+            flex-direction: column;
+        }
+
+        .campos {
+            padding: 24px 0 27px;
+        }
+
+        .formulario-footer {
+            flex-direction: column-reverse;
+        }
+
+        .btn-cancelar,
+        .btn-salvar {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+</body>
+</html>

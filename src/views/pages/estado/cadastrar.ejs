@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid py-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4">
+
+                        <div class="mb-4">
+
+                            <h1 class="text-danger fw-bold mb-1">
+                                Cadastro de Estado
+                            </h1>
+
+                            <p class="text-muted mb-0">
+                                Informe os dados do estado para cadastrar no sistema.
+                            </p>
+
+                        </div>
+
+
+                        <form
+                            action="/estado/cadastrar"
+                            method="POST"
+                            id="formEstado"
+                        >
+
+                            <div class="row g-4">
+
+                                <!-- NOME -->
+                                <div class="col-md-8">
+
+                                    <label
+                                        for="nome"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Nome do Estado
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="nome"
+                                        name="nome"
+                                        class="form-control"
+                                        placeholder="Ex: São Paulo"
+                                        maxlength="60"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <!-- SIGLA -->
+                                <div class="col-md-4">
+
+                                    <label
+                                        for="sigla_estado"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Sigla
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="sigla_estado"
+                                        name="sigla_estado"
+                                        class="form-control text-uppercase"
+                                        placeholder="Ex: SP"
+                                        maxlength="2"
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+                            <div class="d-flex gap-2 mt-4">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger px-4"
+                                >
+                                    Salvar Estado
+                                </button>
+
+                                <a
+                                    href="/estado/listar"
+                                    class="btn btn-outline-secondary px-4"
+                                >
+                                    Voltar
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <!-- SWEETALERT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+
+        // Deixa a sigla automaticamente em maiúsculo
+        const sigla =
+            document.getElementById('sigla_estado');
+
+        sigla.addEventListener('input', function () {
+
+            this.value =
+                this.value.toUpperCase();
+
+        });
+
+
+        // Confirmação antes de cadastrar
+        const formEstado =
+            document.getElementById('formEstado');
+
+        formEstado.addEventListener('submit', function (e) {
+
+            e.preventDefault();
+
+            Swal.fire({
+
+                title: 'Cadastrar estado',
+                text: 'Deseja realmente cadastrar este estado no sistema?',
+
+                icon: 'question',
+
+                showCancelButton: true,
+
+                confirmButtonText: 'Sim, cadastrar',
+                cancelButtonText: 'Cancelar',
+
+                confirmButtonColor: '#8b2e2e',
+                cancelButtonColor: '#6c757d'
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    formEstado.submit();
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+
+</body>
+</html>

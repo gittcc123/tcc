@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<%- include('../../partials/head') %>
+
+    <body class="bg-light">
+
+        <%- include('../../partials/header') %>
+
+            <div class="d-flex">
+
+                <%- include('../../partials/sidebar') %>
+
+                    <main class="content w-100">
+
+                        <div class="container-fluid px-4 py-4">
+
+                            <!-- CABEÇALHO -->
+
+                            <div class="page-heading mb-4">
+
+                                <div class="page-heading-content">
+
+                                    
+                                    <div>
+
+                                        
+
+                                        <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                                            <h1>
+                                                Emitir alerta
+                                            </h1>
+
+                                            <p>
+                                                Registre uma ocorrência identificada durante a viagem.
+                                            </p>
+
+                                            <% } else if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                <h1>
+                                                    Novo comunicado
+                                                </h1>
+
+                                                <p>
+                                                    Publique uma informação administrativa no sistema.
+                                                </p>
+
+                                                <% } %>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- MENSAGEM -->
+
+                            <% if (mensagem) { %>
+
+                                <div class="alert alert-<%= mensagem.tipo === 'success' ? 'success' : 'danger' %> alert-dismissible fade show shadow-sm"
+                                    role="alert">
+
+                                    <strong>
+                                        <%= mensagem.tituloMensagem %>
+                                    </strong>
+
+                                    <%= mensagem.valor %>
+
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                                </div>
+
+                                <% } %>
+
+
+                                    <div class="row g-4 align-items-start">
+
+
+                                        <!-- FORMULÁRIO -->
+
+                                        <div class="<%= usuario && usuario.tipo === 'ADMIN'
+                    ? 'col-xl-8 col-lg-10 mx-auto'
+                    : 'col-lg-8' %>">
+
+                                            <div class="alerta-card">
+
+                                                <!-- TOPO DO CARD -->
+
+                                                <div class="card-top">
+
+                                                    <div class="card-top-icon">
+
+                                                        <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+                                                            <i class="bi bi-exclamation-circle"></i>
+                                                            <% } else { %>
+                                                                <i class="bi bi-megaphone"></i>
+                                                                <% } %>
+
+                                                    </div>
+
+                                                    <div>
+
+                                                        <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                                                            <h5>
+                                                                Ocorrência durante a viagem
+                                                            </h5>
+
+                                                            <p>
+                                                                Informe o motivo da ocorrência de forma objetiva.
+                                                            </p>
+
+                                                            <% } else { %>
+
+                                                                <h5>
+                                                                    Comunicado administrativo
+                                                                </h5>
+
+                                                                <p>
+                                                                    Informe aos usuários uma ocorrência ou aviso do
+                                                                    sistema.
+                                                                </p>
+
+                                                                <% } %>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- CORPO -->
+
+                                                <div class="card-content">
+
+                                                    <form id="form-alerta" action="/alerta/cadastrar" method="POST">
+
+                                                        <!-- TIPO -->
+
+                                                        <div class="field-group">
+
+                                                            <label for="tipo">
+
+                                                                <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+                                                                    Tipo da ocorrência
+                                                                    <% } else { %>
+                                                                        Tipo do comunicado
+                                                                        <% } %>
+
+                                                            </label>
+
+                                                            <select id="tipo" name="tipo" class="form-select" required>
+
+                                                                <option value="">
+                                                                    Selecione uma opção
+                                                                </option>
+
+                                                                <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                                                                    <option value="Urgente">
+                                                                        Urgente
+                                                                    </option>
+
+                                                                    <option value="Atraso">
+                                                                        Atraso
+                                                                    </option>
+
+                                                                    <option value="Problema no veículo">
+                                                                        Problema no veículo
+                                                                    </option>
+
+                                                                    <option value="Trânsito">
+                                                                        Trânsito
+                                                                    </option>
+
+                                                                    <option value="Acidente">
+                                                                        Acidente
+                                                                    </option>
+
+                                                                    <option value="Informativo">
+                                                                        Informativo
+                                                                    </option>
+
+                                                                    <% } else if (usuario && usuario.tipo==='ADMIN' ) {
+                                                                        %>
+
+                                                                        <option value="Urgente">
+                                                                            Urgente
+                                                                        </option>
+
+                                                                        <option value="Aviso">
+                                                                            Aviso
+                                                                        </option>
+
+                                                                        <option value="Informativo">
+                                                                            Informativo
+                                                                        </option>
+
+                                                                        <% } %>
+
+                                                            </select>
+
+                                                        </div>
+
+
+                                                        <!-- MENSAGEM -->
+
+                                                        <div class="field-group">
+
+                                                            <div class="label-row">
+
+                                                                <label for="mensagem">
+
+                                                                    <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+                                                                        Motivo da ocorrência
+                                                                        <% } else { %>
+                                                                            Mensagem do comunicado
+                                                                            <% } %>
+
+                                                                </label>
+
+                                                                <span class="field-limit">
+                                                                    Máximo de 500 caracteres
+                                                                </span>
+
+                                                            </div>
+
+                                                            <textarea id="mensagem" name="mensagem"
+                                                                class="form-control mensagem-field" rows="6"
+                                                                maxlength="500" required
+                                                                placeholder="<%= usuario && usuario.tipo === 'MOTORISTA'
+                                            ? 'Descreva o motivo da ocorrência. Ex.: O veículo está parado devido a um problema mecânico.'
+                                            : 'Digite o comunicado que será exibido aos usuários do sistema.' %>"></textarea>
+
+                                                            <div class="field-footer">
+
+                                                                <small>
+
+                                                                    <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+                                                                        Descreva o que aconteceu e, se necessário,
+                                                                        informe como a ocorrência afeta a viagem.
+                                                                        <% } else { %>
+                                                                            Escreva uma mensagem clara e objetiva.
+                                                                            <% } %>
+
+                                                                </small>
+
+                                                                <small id="contador-caracteres">
+                                                                    0/500
+                                                                </small>
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <!-- STATUS -->
+
+                                                        <div class="field-group">
+
+                                                            <label for="status">
+                                                                Status
+                                                            </label>
+
+                                                            <select id="status" name="status" class="form-select"
+                                                                required>
+
+                                                                <option value="Ativo">
+                                                                    Ativo
+                                                                </option>
+
+                                                                <option value="Inativo">
+                                                                    Inativo
+                                                                </option>
+
+                                                            </select>
+
+                                                        </div>
+
+
+                                                        <!-- LOCALIZAÇÃO -->
+
+                                                        <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                                                            <div class="field-group">
+
+                                                                <label>
+                                                                    Localização da ocorrência
+                                                                </label>
+
+                                                                <div id="localizacao-status" class="location-box">
+
+                                                                    <span class="spinner-border spinner-border-sm"
+                                                                        id="localizacao-spinner" role="status"></span>
+
+                                                                    <span id="localizacao-texto">
+                                                                        Tentando identificar sua localização...
+                                                                    </span>
+
+                                                                </div>
+
+                                                                <div class="field-help">
+                                                                    A localização será associada ao alerta quando
+                                                                    estiver disponível.
+                                                                    O alerta poderá ser emitido mesmo se o GPS não for
+                                                                    localizado.
+                                                                </div>
+
+                                                                <input type="hidden" id="latitude" name="latitude">
+
+                                                                <input type="hidden" id="longitude" name="longitude">
+
+                                                                <input type="hidden" id="localizacao_id"
+                                                                    name="localizacao_id">
+
+                                                            </div>
+
+                                                            <% } else { %>
+
+                                                                <input type="hidden" name="localizacao_id" value="">
+
+                                                                <% } %>
+
+
+                                                                    <!-- PREVIEW ADMIN -->
+
+                                                                    <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                                        <div class="field-group">
+
+                                                                            <label>
+                                                                                Pré-visualização
+                                                                            </label>
+
+                                                                            <div class="preview-box">
+
+                                                                                <div class="mb-2">
+
+                                                                                    <span id="preview-tipo"
+                                                                                        class="preview-badge">
+                                                                                        Informativo
+                                                                                    </span>
+
+                                                                                </div>
+
+                                                                                <div class="preview-label">
+                                                                                    O sistema alerta que:
+                                                                                </div>
+
+                                                                                <div class="preview-admin">
+                                                                                    Administração informa:
+                                                                                </div>
+
+                                                                                <div id="preview-mensagem"
+                                                                                    class="preview-message">
+                                                                                    Sua mensagem aparecerá aqui.
+                                                                                </div>
+
+                                                                                <div class="preview-date">
+                                                                                    <i class="bi bi-clock me-1"></i>
+                                                                                    A data e o horário serão registrados
+                                                                                    automaticamente.
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <% } %>
+
+
+                                                                            <!-- BOTÕES -->
+
+                                                                            <div class="form-actions">
+
+                                                                                <a href="/alerta/listar"
+                                                                                    class="btn btn-cancelar">
+                                                                                    <i class="bi bi-arrow-left"></i>
+                                                                                    Cancelar
+                                                                                </a>
+
+                                                                                <button type="submit"
+                                                                                    id="btn-salvar-alerta"
+                                                                                    class="btn btn-salvar">
+
+                                                                                    <% if (usuario &&
+                                                                                        usuario.tipo==='MOTORISTA' ) {
+                                                                                        %>
+
+                                                                                        <i class="bi bi-send-fill"></i>
+                                                                                        Emitir alerta
+
+                                                                                        <% } else { %>
+
+                                                                                            <i
+                                                                                                class="bi bi-megaphone-fill"></i>
+                                                                                            Publicar comunicado
+
+                                                                                            <% } %>
+
+                                                                                </button>
+
+                                                                            </div>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- PAINEL MOTORISTA -->
+
+                                        <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                                            <div class="col-lg-4">
+
+                                                <!-- INSTRUÇÕES -->
+
+                                                <div class="side-card">
+
+                                                    <div class="side-header">
+
+                                                        <div class="side-icon">
+                                                            <i class="bi bi-list-check"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <h6>
+                                                                Instruções para emissão
+                                                            </h6>
+
+                                                            <span>
+                                                                Siga estas etapas para registrar a ocorrência
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="side-body">
+
+                                                        <div class="instruction">
+
+                                                            <div class="instruction-number">
+                                                                1
+                                                            </div>
+
+                                                            <div>
+                                                                <strong>
+                                                                    Selecione o tipo
+                                                                </strong>
+
+                                                                <small>
+                                                                    Escolha a categoria que melhor representa a
+                                                                    ocorrência.
+                                                                </small>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="instruction">
+
+                                                            <div class="instruction-number">
+                                                                2
+                                                            </div>
+
+                                                            <div>
+                                                                <strong>
+                                                                    Informe o motivo
+                                                                </strong>
+
+                                                                <small>
+                                                                    Explique de maneira clara o que aconteceu durante a
+                                                                    viagem.
+                                                                </small>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="instruction">
+
+                                                            <div class="instruction-number">
+                                                                3
+                                                            </div>
+
+                                                            <div>
+                                                                <strong>
+                                                                    Seja objetivo
+                                                                </strong>
+
+                                                                <small>
+                                                                    Informe somente os detalhes necessários para
+                                                                    compreender a situação.
+                                                                </small>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="instruction">
+
+                                                            <div class="instruction-number">
+                                                                4
+                                                            </div>
+
+                                                            <div>
+                                                                <strong>
+                                                                    Confirme o alerta
+                                                                </strong>
+
+                                                                <small>
+                                                                    Após o envio, a ocorrência ficará registrada no
+                                                                    sistema.
+                                                                </small>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- EXEMPLOS -->
+
+                                                <div class="side-card">
+
+                                                    <div class="side-header">
+
+                                                        <div class="side-icon">
+                                                            <i class="bi bi-chat-square-text"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <h6>
+                                                                Exemplos de ocorrências
+                                                            </h6>
+
+                                                            <span>
+                                                                Sugestões para descrição
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="side-body">
+
+                                                        <div class="example">
+
+                                                            <span>
+                                                                Atraso
+                                                            </span>
+
+                                                            <p>
+                                                                O veículo está com atraso devido ao congestionamento na
+                                                                avenida principal.
+                                                            </p>
+
+                                                        </div>
+
+                                                        <div class="example">
+
+                                                            <span>
+                                                                Problema no veículo
+                                                            </span>
+
+                                                            <p>
+                                                                O veículo apresentou uma falha mecânica e precisará
+                                                                interromper temporariamente a viagem.
+                                                            </p>
+
+                                                        </div>
+
+                                                        <div class="example">
+
+                                                            <span>
+                                                                Trânsito
+                                                            </span>
+
+                                                            <p>
+                                                                O percurso apresenta lentidão devido ao trânsito
+                                                                intenso.
+                                                            </p>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- GPS -->
+
+                                                <div class="side-card">
+
+                                                    <div class="side-header">
+
+                                                        <div class="side-icon">
+                                                            <i class="bi bi-geo-alt"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <h6>
+                                                                Localização da ocorrência
+                                                            </h6>
+
+                                                            <span>
+                                                                Informações obtidas pelo GPS
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="side-body">
+
+                                                        <div class="gps-info">
+
+                                                            <div class="gps-icon">
+                                                                <i class="bi bi-crosshair"></i>
+                                                            </div>
+
+                                                            <div>
+
+                                                                <strong>
+                                                                    GPS automático
+                                                                </strong>
+
+                                                                <small>
+                                                                    Quando disponível, a posição será associada ao
+                                                                    alerta.
+                                                                </small>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            <% } %>
+
+
+                                                <!-- PAINEL ADMIN -->
+
+                                                <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                                                    <div class="col-xl-8 col-lg-10 mx-auto">
+
+                                                        <div class="admin-info">
+
+                                                            <i class="bi bi-info-circle-fill"></i>
+
+                                                            <div>
+
+                                                                <strong>
+                                                                    Comunicado administrativo
+                                                                </strong>
+
+                                                                <span>
+                                                                    A mensagem será apresentada aos usuários como um
+                                                                    alerta emitido pela administração.
+                                                                </span>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <% } %>
+
+                                    </div>
+
+                        </div>
+
+                    </main>
+
+            </div>
+
+
+            <!-- JAVASCRIPT MOTORISTA -->
+
+            <% if (usuario && usuario.tipo==='MOTORISTA' ) { %>
+
+                <script>
+
+                    (function () {
+
+                        var statusBox =
+                            document.getElementById('localizacao-status');
+
+                        var spinner =
+                            document.getElementById('localizacao-spinner');
+
+                        var texto =
+                            document.getElementById('localizacao-texto');
+
+                        var inputLat =
+                            document.getElementById('latitude');
+
+                        var inputLon =
+                            document.getElementById('longitude');
+
+                        var inputLocId =
+                            document.getElementById('localizacao_id');
+
+
+                        function marcarErro(msg) {
+
+                            spinner.classList.add('d-none');
+
+                            statusBox.classList.remove('location-success');
+
+                            statusBox.classList.add('location-error');
+
+                            texto.classList.remove(
+                                'text-muted',
+                                'text-success'
+                            );
+
+                            texto.classList.add('text-danger');
+
+                            texto.textContent = msg;
+
+                        }
+
+
+                        function marcarSucesso(msg) {
+
+                            spinner.classList.add('d-none');
+
+                            statusBox.classList.remove('location-error');
+
+                            statusBox.classList.add('location-success');
+
+                            texto.classList.remove(
+                                'text-muted',
+                                'text-danger'
+                            );
+
+                            texto.classList.add('text-success');
+
+                            texto.textContent = msg;
+
+                        }
+
+
+                        function obterLocalizacao() {
+
+                            if (!('geolocation' in navigator)) {
+
+                                marcarErro(
+                                    'O navegador não permite captura automática de localização. O alerta ainda poderá ser emitido.'
+                                );
+
+                                return;
+
+                            }
+
+
+                            navigator.geolocation.getCurrentPosition(
+
+                                function (posicao) {
+
+                                    var lat =
+                                        posicao.coords.latitude;
+
+                                    var lon =
+                                        posicao.coords.longitude;
+
+
+                                    inputLat.value = lat;
+                                    inputLon.value = lon;
+
+
+                                    resolverLocalizacaoId(
+                                        lat,
+                                        lon
+                                    );
+
+                                },
+
+                                function () {
+
+                                    marcarErro(
+                                        'Não foi possível obter sua localização. O alerta poderá ser emitido sem localização.'
+                                    );
+
+                                },
+
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 10000,
+                                    maximumAge: 0
+                                }
+
+                            );
+
+                        }
+
+
+                        function resolverLocalizacaoId(lat, lon) {
+
+                            fetch(
+                                '/localizacaoVeiculo/atual?lat='
+                                + encodeURIComponent(lat)
+                                + '&lon='
+                                + encodeURIComponent(lon)
+                            )
+
+                                .then(function (resp) {
+
+                                    if (!resp.ok) {
+                                        throw new Error(
+                                            'Não foi possível consultar a localização.'
+                                        );
+                                    }
+
+                                    return resp.json();
+
+                                })
+
+                                .then(function (data) {
+
+                                    if (data && data.id) {
+
+                                        inputLocId.value = data.id;
+
+                                        marcarSucesso(
+                                            'Localização atual associada ao alerta.'
+                                        );
+
+                                    } else {
+
+                                        marcarSucesso(
+                                            'Localização capturada. O alerta será emitido normalmente.'
+                                        );
+
+                                    }
+
+                                })
+
+                                .catch(function () {
+
+                                    marcarSucesso(
+                                        'Localização capturada. O alerta será emitido normalmente.'
+                                    );
+
+                                });
+
+                        }
+
+
+                        obterLocalizacao();
+
+                    })();
+
+                </script>
+
+                <% } %>
+
+
+                    <!-- CONTADOR -->
+
+                    <script>
+
+                        (function () {
+
+                            var mensagem =
+                                document.getElementById('mensagem');
+
+                            var contador =
+                                document.getElementById('contador-caracteres');
+
+
+                            if (!mensagem || !contador) {
+                                return;
+                            }
+
+
+                            function atualizarContador() {
+
+                                contador.textContent =
+                                    mensagem.value.length + '/500';
+
+                            }
+
+
+                            mensagem.addEventListener(
+                                'input',
+                                atualizarContador
+                            );
+
+                            atualizarContador();
+
+                        })();
+
+                    </script>
+
+
+                    <!-- PREVIEW ADMIN -->
+
+                    <% if (usuario && usuario.tipo==='ADMIN' ) { %>
+
+                        <script>
+
+                            (function () {
+
+                                var tipo =
+                                    document.getElementById('tipo');
+
+                                var mensagem =
+                                    document.getElementById('mensagem');
+
+                                var previewTipo =
+                                    document.getElementById('preview-tipo');
+
+                                var previewMensagem =
+                                    document.getElementById('preview-mensagem');
+
+
+                                if (
+                                    !tipo ||
+                                    !mensagem ||
+                                    !previewTipo ||
+                                    !previewMensagem
+                                ) {
+                                    return;
+                                }
+
+
+                                tipo.addEventListener(
+                                    'change',
+                                    function () {
+
+                                        previewTipo.textContent =
+                                            this.value
+                                                ? this.value
+                                                : 'Informativo';
+
+                                    }
+                                );
+
+
+                                mensagem.addEventListener(
+                                    'input',
+                                    function () {
+
+                                        previewMensagem.textContent =
+                                            this.value.trim()
+                                                ? this.value
+                                                : 'Sua mensagem aparecerá aqui.';
+
+                                    }
+                                );
+
+                            })();
+
+                        </script>
+
+                        <% } %>
+
+
+                            <style>
+                                .content {
+                                    min-height: 100vh;
+                                }
+
+                                /* CABEÇALHO */
+
+                                .page-heading {
+                                    background: #ffffff;
+                                    border: 1px solid #e5e7eb;
+                                    border-left: 4px solid #8b2e2e;
+                                    border-radius: 12px;
+                                    padding: 22px 24px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                }
+
+                                .page-heading-content {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 15px;
+                                }
+
+                                .page-heading-icon {
+                                    width: 46px;
+                                    height: 46px;
+                                    border-radius: 10px;
+                                    background: #f8e8e8;
+                                    color: #8b2e2e;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 19px;
+                                }
+
+                                .page-eyebrow {
+                                    display: block;
+                                    color: #8b2e2e;
+                                    font-size: 10px;
+                                    font-weight: 800;
+                                    letter-spacing: .7px;
+                                    margin-bottom: 3px;
+                                }
+
+                                .page-heading h1 {
+                                    margin: 0;
+                                    color: #252525;
+                                    font-size: 25px;
+                                    font-weight: 700;
+                                }
+
+                                .page-heading p {
+                                    margin: 4px 0 0;
+                                    color: #747b83;
+                                    font-size: 13px;
+                                }
+
+                                /* CARD */
+
+                                .alerta-card {
+                                    background: #ffffff;
+                                    border: 1px solid #e3e5e8;
+                                    border-radius: 14px;
+                                    overflow: hidden;
+                                    box-shadow: 0 5px 20px rgba(0, 0, 0, .045);
+                                }
+
+                                .card-top {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 13px;
+                                    padding: 20px 24px;
+                                    border-bottom: 1px solid #eeeeef;
+                                    background: #fcfcfc;
+                                }
+
+                                .card-top-icon {
+                                    width: 42px;
+                                    height: 42px;
+                                    border-radius: 9px;
+                                    background: #f8e8e8;
+                                    color: #8b2e2e;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 17px;
+                                }
+
+                                .card-top h5 {
+                                    margin: 0 0 3px;
+                                    color: #292929;
+                                    font-size: 15px;
+                                    font-weight: 700;
+                                }
+
+                                .card-top p {
+                                    margin: 0;
+                                    color: #7b8188;
+                                    font-size: 12px;
+                                }
+
+                                .card-content {
+                                    padding: 28px;
+                                }
+
+                                /* CAMPOS */
+
+                                .field-group {
+                                    margin-bottom: 23px;
+                                }
+
+                                .field-group>label,
+                                .label-row label {
+                                    display: block;
+                                    margin-bottom: 8px;
+                                    color: #30343a;
+                                    font-size: 13px;
+                                    font-weight: 700;
+                                }
+
+                                .label-row {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    gap: 10px;
+                                }
+
+                                .label-row label {
+                                    margin-bottom: 8px;
+                                }
+
+                                .field-limit {
+                                    color: #999fa6;
+                                    font-size: 10px;
+                                }
+
+                                .form-select,
+                                .form-control {
+                                    border-color: #dfe2e6;
+                                    border-radius: 8px;
+                                    color: #34383d;
+                                    font-size: 13px;
+                                }
+
+                                .form-select {
+                                    min-height: 44px;
+                                }
+
+                                .form-control {
+                                    padding: 11px 13px;
+                                }
+
+                                .form-select:focus,
+                                .form-control:focus {
+                                    border-color: #a75a5a;
+                                    box-shadow: 0 0 0 .18rem rgba(139, 46, 46, .08);
+                                }
+
+                                .mensagem-field {
+                                    resize: vertical;
+                                    min-height: 145px;
+                                    line-height: 1.55;
+                                }
+
+                                .field-footer {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    gap: 10px;
+                                    margin-top: 7px;
+                                }
+
+                                .field-footer small {
+                                    color: #858b92;
+                                    font-size: 11px;
+                                    line-height: 1.5;
+                                }
+
+                                .field-help {
+                                    color: #858b92;
+                                    font-size: 11px;
+                                    line-height: 1.5;
+                                    margin-top: 7px;
+                                }
+
+                                /* LOCALIZAÇÃO */
+
+                                .location-box {
+                                    min-height: 52px;
+                                    padding: 12px 14px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 11px;
+                                    border: 1px solid #dfe2e6;
+                                    border-radius: 9px;
+                                    background: #f8f9fa;
+                                    color: #686f76;
+                                    font-size: 12px;
+                                }
+
+                                .location-success {
+                                    background: #f1f8f4;
+                                    border-color: #b8d8c5;
+                                }
+
+                                .location-error {
+                                    background: #fff3f3;
+                                    border-color: #e5b8b8;
+                                }
+
+                                /* PREVIEW */
+
+                                .preview-box {
+                                    padding: 18px;
+                                    border-radius: 10px;
+                                    background: #fcf8f8;
+                                    border: 1px solid #f0dede;
+                                    border-left: 4px solid #8b2e2e;
+                                }
+
+                                .preview-badge {
+                                    display: inline-flex;
+                                    padding: 5px 9px;
+                                    border-radius: 6px;
+                                    background: #f8e5e5;
+                                    color: #8b2e2e;
+                                    font-size: 10px;
+                                    font-weight: 700;
+                                }
+
+                                .preview-label {
+                                    color: #7d838a;
+                                    font-size: 11px;
+                                    margin-bottom: 4px;
+                                }
+
+                                .preview-admin {
+                                    color: #60666d;
+                                    font-size: 11px;
+                                    margin-bottom: 5px;
+                                }
+
+                                .preview-message {
+                                    color: #30343a;
+                                    font-size: 13px;
+                                    line-height: 1.5;
+                                }
+
+                                .preview-date {
+                                    color: #888e95;
+                                    font-size: 10px;
+                                    margin-top: 13px;
+                                }
+
+                                /* BOTÕES */
+
+                                .form-actions {
+                                    display: flex;
+                                    justify-content: flex-end;
+                                    gap: 9px;
+                                    padding-top: 22px;
+                                    border-top: 1px solid #eeeeef;
+                                }
+
+                                .form-actions .btn {
+                                    min-height: 40px;
+                                    border-radius: 8px;
+                                    padding: 8px 16px;
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                }
+
+                                .btn-cancelar {
+                                    background: #ffffff;
+                                    color: #626970;
+                                    border: 1px solid #d9dde1;
+                                }
+
+                                .btn-cancelar:hover {
+                                    background: #f7f7f8;
+                                    color: #3f4449;
+                                }
+
+                                .btn-salvar {
+                                    background: #8b2e2e;
+                                    color: #ffffff;
+                                    border: 1px solid #8b2e2e;
+                                }
+
+                                .btn-salvar:hover {
+                                    background: #752525;
+                                    color: #ffffff;
+                                }
+
+                                /* PAINEL LATERAL */
+
+                                .side-card {
+                                    background: #ffffff;
+                                    border: 1px solid #e3e5e8;
+                                    border-radius: 13px;
+                                    overflow: hidden;
+                                    margin-bottom: 16px;
+                                    box-shadow: 0 4px 16px rgba(0, 0, 0, .035);
+                                }
+
+                                .side-header {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 11px;
+                                    padding: 16px 18px;
+                                    border-bottom: 1px solid #eeeeef;
+                                }
+
+                                .side-icon {
+                                    width: 37px;
+                                    height: 37px;
+                                    min-width: 37px;
+                                    border-radius: 9px;
+                                    background: #f8e5e5;
+                                    color: #8b2e2e;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 15px;
+                                }
+
+                                .side-header h6 {
+                                    margin: 0;
+                                    color: #292929;
+                                    font-size: 13px;
+                                    font-weight: 700;
+                                }
+
+                                .side-header span {
+                                    display: block;
+                                    color: #898f96;
+                                    font-size: 10px;
+                                    margin-top: 2px;
+                                }
+
+                                .side-body {
+                                    padding: 17px 18px;
+                                }
+
+                                .instruction {
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: 10px;
+                                    padding: 11px 0;
+                                    border-bottom: 1px solid #f0f0f1;
+                                }
+
+                                .instruction:first-child {
+                                    padding-top: 0;
+                                }
+
+                                .instruction:last-child {
+                                    padding-bottom: 0;
+                                    border-bottom: 0;
+                                }
+
+                                .instruction-number {
+                                    width: 25px;
+                                    height: 25px;
+                                    min-width: 25px;
+                                    border-radius: 50%;
+                                    background: #f8e5e5;
+                                    color: #8b2e2e;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 10px;
+                                    font-weight: 800;
+                                }
+
+                                .instruction strong {
+                                    display: block;
+                                    color: #30343a;
+                                    font-size: 12px;
+                                    margin-bottom: 2px;
+                                }
+
+                                .instruction small {
+                                    display: block;
+                                    color: #7c8289;
+                                    font-size: 10.5px;
+                                    line-height: 1.5;
+                                }
+
+                                .example {
+                                    padding: 12px 0;
+                                    border-bottom: 1px solid #f0f0f1;
+                                }
+
+                                .example:first-child {
+                                    padding-top: 0;
+                                }
+
+                                .example:last-child {
+                                    padding-bottom: 0;
+                                    border-bottom: 0;
+                                }
+
+                                .example span {
+                                    display: inline-block;
+                                    padding: 4px 8px;
+                                    border-radius: 5px;
+                                    background: #f8e5e5;
+                                    color: #8b2e2e;
+                                    font-size: 9px;
+                                    font-weight: 800;
+                                    margin-bottom: 6px;
+                                }
+
+                                .example p {
+                                    margin: 0;
+                                    color: #777e85;
+                                    font-size: 10.5px;
+                                    line-height: 1.5;
+                                }
+
+                                .gps-info {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 11px;
+                                }
+
+                                .gps-icon {
+                                    width: 38px;
+                                    height: 38px;
+                                    min-width: 38px;
+                                    border-radius: 9px;
+                                    background: #f8e5e5;
+                                    color: #8b2e2e;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+
+                                .gps-info strong {
+                                    display: block;
+                                    color: #30343a;
+                                    font-size: 12px;
+                                    margin-bottom: 2px;
+                                }
+
+                                .gps-info small {
+                                    display: block;
+                                    color: #7c8289;
+                                    font-size: 10.5px;
+                                    line-height: 1.45;
+                                }
+
+                                /* ADMIN */
+
+                                .admin-info {
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: 12px;
+                                    padding: 14px 16px;
+                                    border-radius: 9px;
+                                    background: #f8e5e5;
+                                    color: #6b2020;
+                                }
+
+                                .admin-info>i {
+                                    font-size: 16px;
+                                    margin-top: 1px;
+                                }
+
+                                .admin-info strong {
+                                    display: block;
+                                    font-size: 12px;
+                                    margin-bottom: 2px;
+                                }
+
+                                .admin-info span {
+                                    display: block;
+                                    font-size: 11px;
+                                    line-height: 1.5;
+                                }
+
+                                /* RESPONSIVO */
+
+                                @media (max-width: 991px) {
+
+                                    .side-card {
+                                        margin-bottom: 14px;
+                                    }
+
+                                }
+
+                                @media (max-width: 768px) {
+
+                                    .container-fluid {
+                                        padding-left: 15px !important;
+                                        padding-right: 15px !important;
+                                    }
+
+                                    .page-heading {
+                                        padding: 18px;
+                                    }
+
+                                    .page-heading-content {
+                                        align-items: flex-start;
+                                    }
+
+                                    .page-heading h1 {
+                                        font-size: 21px;
+                                    }
+
+                                    .page-heading p {
+                                        font-size: 12px;
+                                    }
+
+                                    .card-top {
+                                        padding: 18px 20px;
+                                    }
+
+                                    .card-content {
+                                        padding: 20px;
+                                    }
+
+                                    .label-row {
+                                        align-items: flex-start;
+                                        flex-direction: column;
+                                        gap: 2px;
+                                    }
+
+                                    .form-actions {
+                                        flex-direction: column-reverse;
+                                    }
+
+                                    .form-actions .btn {
+                                        width: 100%;
+                                    }
+
+                                }
+                            </style>
+
+    </body>
+
+</html>

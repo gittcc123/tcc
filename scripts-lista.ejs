@@ -1,0 +1,92 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    (function () {
+
+        // ===== Busca =====
+        var campoBusca = document.getElementById('busca-lista');
+
+        if (campoBusca) {
+
+            var norm = function (t) {
+                return String(t || '').toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            };
+
+            var linhas = document.querySelectorAll('.item');
+            var semResultado = document.getElementById('sem-resultado');
+            var total = document.getElementById('total-lista');
+
+            campoBusca.addEventListener('input', function () {
+
+                var q = norm(campoBusca.value);
+                var visiveis = 0;
+
+                linhas.forEach(function (linha) {
+                    var mostrar = norm(linha.dataset.busca).includes(q);
+                    linha.style.display = mostrar ? '' : 'none';
+                    if (mostrar) { visiveis++; }
+                });
+
+                if (semResultado) { semResultado.style.display = visiveis ? 'none' : 'block'; }
+                if (total) { total.textContent = visiveis + ' de ' + linhas.length; }
+
+            });
+
+        }
+
+        // ===== Exclusão (formulários POST e links) =====
+        function confirmar(elemento) {
+
+            return Swal.fire({
+                title: 'Deseja realmente excluir?',
+                text: elemento.dataset.confirmar || 'Essa ação não poderá ser desfeita.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#7a1f1f',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            });
+
+        }
+
+        document.querySelectorAll('.form-excluir').forEach(function (form) {
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                confirmar(form).then(function (result) {
+                    if (result.isConfirmed) { form.submit(); }
+                });
+            });
+
+        });
+
+        document.querySelectorAll('.link-excluir').forEach(function (link) {
+
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                confirmar(link).then(function (result) {
+                    if (result.isConfirmed) { window.location.href = link.href; }
+                });
+            });
+
+        });
+
+    })();
+</script>
+
+<% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+    <script>
+        Swal.fire({
+            icon: '<%= mensagem.tipo %>',
+            title: '<%= mensagem.tituloMensagem || mensagem.titulo || "Aviso" %>',
+            text: '<%= mensagem.valor %>',
+            confirmButtonColor: '#7a1f1f',
+            confirmButtonText: 'OK'
+        });
+    </script>
+
+<% } %>

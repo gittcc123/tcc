@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <div class="content w-100">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div>
+                            <h1 class="text-danger fw-bold mb-1">
+                                Escalas dos Motoristas
+                            </h1>
+
+                            <p class="text-muted mb-0">
+                                Consulte as escalas e horários de trabalho dos motoristas.
+                            </p>
+                        </div>
+
+                        <% if (usuario && usuario.tipo === 'ADMIN') { %>
+
+                            <a
+                                href="/escalamotorista/cadastrar"
+                                class="btn btn-danger"
+                            >
+                                <i class="bi bi-plus-lg"></i>
+                                Nova Escala
+                            </a>
+
+                        <% } %>
+
+                    </div>
+
+
+                    <% if (escalasMotorista && escalasMotorista.length > 0) { %>
+
+                        <div class="row g-4">
+
+                            <% escalasMotorista.forEach(escala => { %>
+
+                                <div class="col-12">
+
+                                    <div class="card escala-card border-0 shadow-sm">
+
+                                        <!-- CABEÇALHO -->
+
+                                        <div class="card-header bg-white border-0 p-4">
+
+                                            <div class="d-flex justify-content-between align-items-center">
+
+                                                <div class="d-flex align-items-center gap-3">
+
+                                                    <!-- FOTO DO MOTORISTA -->
+
+                                                    <div class="motorista-foto">
+
+                                                        <% if (escala.motorista?.usuario?.id) { %>
+
+                                                            <img
+                                                                src="/foto/<%= escala.motorista.usuario.id %>"
+                                                                alt="Foto de <%= escala.motorista.usuario.nome || 'Motorista' %>"
+                                                                onerror="mostrarIconeMotorista(this)"
+                                                            >
+
+                                                            <i
+                                                                class="bi bi-person-fill motorista-fallback"
+                                                                style="display: none;"
+                                                            ></i>
+
+                                                        <% } else { %>
+
+                                                            <i class="bi bi-person-fill"></i>
+
+                                                        <% } %>
+
+                                                    </div>
+
+
+                                                    <!-- NOME -->
+
+                                                    <div>
+
+                                                        <h4 class="fw-bold mb-1">
+
+                                                            <%= escala.motorista?.usuario?.nome || 'Motorista não informado' %>
+
+                                                        </h4>
+
+                                                        <span class="text-muted">
+                                                            Motorista
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="text-end">
+
+                                                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
+
+                                                        <%= escala.escala?.turno || 'Turno não informado' %>
+
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- CONTEÚDO -->
+
+                                        <div class="card-body px-4 pb-4">
+
+                                            <div class="row g-3">
+
+
+                                                <!-- DATA -->
+
+                                                <div class="col-md-3">
+
+                                                    <div class="info-box">
+
+                                                        <small>
+                                                            Data
+                                                        </small>
+
+                                                        <strong>
+
+                                                            <%= new Date(
+                                                                escala.horario_inicio
+                                                            ).toLocaleDateString('pt-BR') %>
+
+                                                        </strong>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- HORÁRIO -->
+
+                                                <div class="col-md-3">
+
+                                                    <div class="info-box">
+
+                                                        <small>
+                                                            Horário de trabalho
+                                                        </small>
+
+                                                        <strong>
+
+                                                            <%= new Date(
+                                                                escala.horario_inicio
+                                                            ).toLocaleTimeString('pt-BR', {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            }) %>
+
+                                                            às
+
+                                                            <%= new Date(
+                                                                escala.horario_fim
+                                                            ).toLocaleTimeString('pt-BR', {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            }) %>
+
+                                                        </strong>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- VEÍCULO -->
+
+                                                <div class="col-md-3">
+
+                                                    <div class="info-box">
+
+                                                        <small>
+                                                            Veículo
+                                                        </small>
+
+                                                        <strong>
+                                                            Nº <%= escala.veiculo?.numero_veiculo || '-' %>
+                                                        </strong>
+
+                                                        <span>
+                                                            <%= escala.veiculo?.placa || 'Sem placa' %>
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- ESCALA -->
+
+                                                <div class="col-md-3">
+
+                                                    <div class="info-box">
+
+                                                        <small>
+                                                            Escala
+                                                        </small>
+
+                                                        <strong>
+                                                            <%= escala.escala?.descricao || 'Não informado' %>
+                                                        </strong>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- BOTÕES ADMIN -->
+
+                                            <% if (usuario && usuario.tipo === 'ADMIN') { %>
+
+                                                <div class="mt-4 d-flex gap-2">
+
+                                                    <a
+                                                        href="/escalamotorista/editar/<%= escala.id %>"
+                                                        class="btn btn-primary btn-sm"
+                                                    >
+
+                                                        <i class="bi bi-pencil"></i>
+                                                        Editar
+
+                                                    </a>
+
+
+                                                    <a
+                                                        href="/escalamotorista/excluir/<%= escala.id %>"
+                                                        class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Deseja realmente excluir esta escala?')"
+                                                    >
+
+                                                        <i class="bi bi-trash"></i>
+                                                        Excluir
+
+                                                    </a>
+
+                                                </div>
+
+                                            <% } %>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            <% }) %>
+
+                        </div>
+
+                    <% } else { %>
+
+                        <div class="alert alert-info">
+
+                            <i class="bi bi-info-circle"></i>
+
+                            Nenhuma escala cadastrada.
+
+                        </div>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+
+
+            <div class="mt-3">
+
+                <a
+                    href="/dashboard"
+                    class="btn btn-secondary px-4 shadow-sm"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <style>
+
+        .escala-card {
+            border-radius: 14px;
+            transition: 0.2s ease;
+        }
+
+        .escala-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12) !important;
+        }
+
+
+        /* FOTO DO MOTORISTA */
+
+        .motorista-foto {
+            width: 58px;
+            height: 58px;
+            min-width: 58px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #f8d7da;
+            color: #992d2d;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 27px;
+        }
+
+        .motorista-foto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .motorista-fallback {
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            height: 100%;
+            border: 1px solid #eee;
+        }
+
+        .info-box small {
+            display: block;
+            color: #777;
+            margin-bottom: 6px;
+        }
+
+        .info-box strong {
+            display: block;
+            color: #333;
+        }
+
+        .info-box span {
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        @media (max-width: 768px) {
+
+            .card-header .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+
+            .card-header .text-end {
+                text-align: left !important;
+            }
+
+        }
+
+    </style>
+
+
+    <script>
+
+        function mostrarIconeMotorista(img) {
+
+            img.style.display = "none";
+
+            const icone = img.nextElementSibling;
+
+            if (icone) {
+                icone.style.display = "flex";
+            }
+
+        }
+
+    </script>
+
+
+</body>
+</html>

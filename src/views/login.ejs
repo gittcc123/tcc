@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bus Status - Login</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:'Segoe UI',sans-serif;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .wrapper{
+      flex:1;
+      display:flex;
+      min-height:100vh;
+    }
+
+    .painel-foto{
+      flex:1.3;
+      /* troque a imagem abaixo pela foto do ponto de ônibus */
+      background:#333 url('/img/pessoas-ponto-onibus.jpeg') center/cover no-repeat;
+      position:relative;
+    }
+
+    .painel-login{
+      flex:1;
+      background:#a52a2a;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:40px 60px;
+    }
+
+    .logo-title{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:24px;
+    }
+
+    .logo-title .icone-bus{
+      width:60px;
+      height:60px;
+      background:#fff;
+      border-radius:50% 50% 50% 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo-title .icone-bus svg{
+      width:34px;
+      height:34px;
+      fill:#a52a2a;
+    }
+
+    .logo-title h1{
+      font-size:2rem;
+      font-weight:700;
+      margin:0;
+      line-height:1.1;
+    }
+
+    .subtitulo{
+      text-align:center;
+      font-size:1.1rem;
+      font-weight:600;
+      margin-bottom:28px;
+      line-height:1.5;
+    }
+
+    .form-area{
+      width:100%;
+      max-width:400px;
+    }
+
+    .form-area label{
+      font-size:.9rem;
+      font-weight:600;
+      margin-bottom:6px;
+      display:block;
+    }
+
+    .input-com-icone{
+      position:relative;
+      margin-bottom:18px;
+    }
+
+    .input-com-icone svg{
+      position:absolute;
+      left:14px;
+      top:50%;
+      transform:translateY(-50%);
+      width:18px;
+      height:18px;
+      fill:#888;
+    }
+
+    .input-com-icone input{
+      width:100%;
+      padding:12px 14px 12px 42px;
+      border:none;
+      border-radius:8px;
+      font-size:.95rem;
+    }
+
+    .input-com-icone .toggle-senha{
+      left:auto;
+      right:14px;
+      cursor:pointer;
+    }
+
+    .btn-entrar{
+      width:100%;
+      background:#fff;
+      color:#a52a2a;
+      border:none;
+      border-radius:8px;
+      padding:12px;
+      font-weight:700;
+      letter-spacing:.5px;
+      margin-top:6px;
+    }
+
+    .btn-entrar:hover{
+      background:#f1f1f1;
+      color:#7a1f1f;
+    }
+
+    .link-cadastro{
+      text-align:center;
+      font-size:.9rem;
+      margin-top:16px;
+    }
+
+    .link-cadastro a{
+      color:#fff;
+      font-weight:700;
+      text-decoration:underline;
+    }
+
+    .divisor{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:22px 0;
+      font-size:.85rem;
+      opacity:.85;
+    }
+
+    .divisor::before,
+    .divisor::after{
+      content:"";
+      flex:1;
+      border-bottom:1px solid rgba(255,255,255,.4);
+    }
+
+    .botoes-social{
+      display:flex;
+      gap:12px;
+    }
+
+    .btn-social{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      background:#fff;
+      color:#333;
+      border-radius:8px;
+      padding:10px;
+      text-decoration:none;
+      font-weight:600;
+      font-size:.9rem;
+    }
+
+    .btn-social svg{
+      width:18px;
+      height:18px;
+    }
+
+    .rodape{
+      background:#8b2222;
+      color:#fff;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 40px;
+    }
+
+    .rodape .destaques{
+      display:flex;
+      gap:36px;
+      flex-wrap:wrap;
+    }
+
+    .destaque{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:.85rem;
+    }
+
+    .destaque .bolinha{
+      width:34px;
+      height:34px;
+      min-width:34px;
+      background:#fff;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .destaque .bolinha svg{
+      width:18px;
+      height:18px;
+      fill:#a52a2a;
+    }
+
+    .copyright{
+      font-size:.8rem;
+      opacity:.85;
+    }
+
+    @media (max-width:900px){
+      .wrapper{
+        flex-direction:column;
+      }
+      .painel-foto{
+        min-height:260px;
+      }
+      .painel-login{
+        padding:40px 24px;
+      }
+      .rodape{
+        justify-content:center;
+        text-align:center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrapper">
+
+    <div class="painel-foto"></div>
+
+    <div class="painel-login">
+
+      <div class="logo-title">
+        <div class="icone-bus">
+          <svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM18 11H6V6h12v5z"/></svg>
+        </div>
+        <h1>Bus Status</h1>
+      </div>
+
+      <p class="subtitulo">
+        Monitore seu ônibus.<br>
+        Vá mais longe.
+      </p>
+
+      <div class="form-area">
+
+        <div id="area-login">
+
+          <form method="POST" action="/usuario/logar">
+
+            <label for="email">E-mail ou telefone</label>
+            <div class="input-com-icone">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <input type="text" id="email" name="email" placeholder="Digite seu e-mail ou telefone" required>
+            </div>
+
+            <label for="senha">Senha</label>
+            <div class="input-com-icone">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+              <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+              <svg class="toggle-senha" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </div>
+
+            <button type="submit" class="btn-entrar">ENTRAR</button>
+
+          </form>
+
+          <p class="link-cadastro">
+            Não tem uma conta? <a href="#" id="ir-cadastro">Cadastre-se</a>
+          </p>
+
+          
+
+
+        </div>
+
+        <div id="area-cadastro" style="display:none;">
+
+          <form method="POST" action="/usuario/cadastrar">
+
+            <label for="nome">Nome</label>
+            <div class="input-com-icone">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+              <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required>
+            </div>
+
+            <label for="email-cad">E-mail</label>
+            <div class="input-com-icone">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <input type="email" id="email-cad" name="email" placeholder="Digite seu e-mail" required>
+            </div>
+
+            <label for="senha-cad">Senha</label>
+            <div class="input-com-icone">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+              <input type="password" id="senha-cad" name="senha" placeholder="Crie uma senha" required>
+            </div>
+
+            <button type="submit" class="btn-entrar">CADASTRAR</button>
+
+          </form>
+
+          <p class="link-cadastro">
+            Já tem uma conta? <a href="#" id="ir-login">Entrar</a>
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="rodape">
+
+    <div class="destaques">
+
+      <div class="destaque">
+        <span class="bolinha">
+          <svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10z"/></svg>
+        </span>
+        Acompanhe seu ônibus<br>em tempo real
+      </div>
+
+      <div class="destaque">
+        <span class="bolinha">
+          <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        </span>
+        Receba alertas e<br>notificações
+      </div>
+
+      <div class="destaque">
+        <span class="bolinha">
+          <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        </span>
+        Seus trajetos<br>favoritos
+      </div>
+
+    </div>
+
+    <div class="copyright">
+      © 2026 Bus Status. Todos os direitos reservados.
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    document.querySelector('.toggle-senha').addEventListener('click', function(){
+      var campo = document.getElementById('senha');
+      campo.type = campo.type === 'password' ? 'text' : 'password';
+    });
+
+    document.getElementById('ir-cadastro').addEventListener('click', function(e){
+      e.preventDefault();
+      document.getElementById('area-login').style.display = 'none';
+      document.getElementById('area-cadastro').style.display = 'block';
+    });
+
+    document.getElementById('ir-login').addEventListener('click', function(e){
+      e.preventDefault();
+      document.getElementById('area-cadastro').style.display = 'none';
+      document.getElementById('area-login').style.display = 'block';
+    });
+  </script>
+
+  <% if (mensagem) { %>
+    <script>
+      Swal.fire({
+        icon: '<%= mensagem.tipo %>',
+        text: '<%= mensagem.valor %>'
+      });
+    </script>
+  <% } %>
+
+</body>
+</html>
+]

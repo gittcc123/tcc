@@ -1,0 +1,95 @@
+<head>
+  <meta charset="UTF-8">
+  <title><%= titulo %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+html, body{
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    display:flex;
+    flex-direction:column;
+    background:#f4f6f9;
+}
+
+.navbar{
+    flex-shrink:0;
+    background:linear-gradient(90deg,#7a1f1f,#a52a2a) !important;
+    box-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+
+.d-flex{
+    flex-grow:1;
+    overflow:hidden;
+}
+
+.sidebar{
+    width:270px;
+    height:100%;
+    overflow-y:auto;
+    transition:.3s;
+    background:linear-gradient(180deg,#8b2e2e,#b74c4c) !important;
+    color:white;
+    box-shadow:2px 0 10px rgba(0,0,0,.15);
+}
+
+.sidebar.hidden{
+    margin-left:-270px;
+}
+
+.sidebar h5{
+    font-weight:bold;
+    border-bottom:1px solid rgba(255,255,255,.3);
+    padding-bottom:10px;
+}
+
+.sidebar .nav-link{
+    color:white !important;
+    border-radius:8px;
+    margin-bottom:5px;
+    transition:.2s;
+}
+
+.sidebar .nav-link:hover{
+    background:rgba(255,255,255,.15);
+    padding-left:15px;
+}
+
+.content{
+    flex-grow:1;
+    padding:30px;
+    overflow-y:auto;
+    height:100%;
+}
+
+#titulo{
+    color:#8b2e2e;
+    font-weight:700;
+}
+
+.card-dashboard{
+    border:none;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.info-box{
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.info-box p{
+    line-height:1.8;
+    color:#555;
+}
+</style>
+</head>

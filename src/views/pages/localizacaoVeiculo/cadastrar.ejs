@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <div class="container-fluid px-4 py-4">
+
+                <!-- CABEÇALHO -->
+                <div class="page-header mb-4">
+
+                    <div>
+                        <h1>
+                            <i class="bi bi-geo-alt-fill me-2"></i>
+                            Cadastrar Localização
+                        </h1>
+
+                        <p>
+                            Registre a localização atual de um veículo no sistema.
+                        </p>
+                    </div>
+
+                    <a
+                        href="/localizacaoVeiculo/listar"
+                        class="btn btn-light"
+                    >
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Voltar
+                    </a>
+
+                </div>
+
+
+                <!-- CARD -->
+                <div class="card cadastro-card border-0 shadow-sm">
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <!-- TÍTULO -->
+                        <div class="section-title mb-4">
+
+                            <div class="section-icon">
+                                <i class="bi bi-pin-map-fill"></i>
+                            </div>
+
+                            <div>
+                                <h4>
+                                    Dados da localização
+                                </h4>
+
+                                <p>
+                                    Selecione o veículo e capture sua posição atual.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <!-- MENSAGEM -->
+                        <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+
+                            <div class="alert alert-<%= mensagem.tipo === 'success' ? 'success' : 'danger' %> mb-4">
+
+                                <strong>
+                                    <%= mensagem.tituloMensagem %>
+                                </strong>
+
+                                <div>
+                                    <%= mensagem.valor %>
+                                </div>
+
+                            </div>
+
+                        <% } %>
+
+
+                        <!-- FORMULÁRIO -->
+                        <form
+                            action="/localizacaoVeiculo/cadastrar"
+                            method="POST"
+                            id="formLocalizacao"
+                        >
+
+                            <div class="row g-4">
+
+                                <!-- VEÍCULO -->
+                                <div class="col-12">
+
+                                    <label
+                                        for="veiculo_id"
+                                        class="form-label"
+                                    >
+                                        Veículo
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-bus-front-fill"></i>
+
+                                        <select
+                                            name="veiculo_id"
+                                            id="veiculo_id"
+                                            class="form-select"
+                                            required
+                                        >
+
+                                            <option value="">
+                                                Selecione o veículo
+                                            </option>
+
+                                            <% if (typeof veiculos !== 'undefined' && veiculos.length > 0) { %>
+
+                                                <% veiculos.forEach(veiculo => { %>
+
+                                                    <option value="<%= veiculo.id %>">
+
+                                                        Ônibus
+                                                        <%= veiculo.numero_veiculo %>
+                                                        -
+                                                        <%= veiculo.placa %>
+
+                                                    </option>
+
+                                                <% }) %>
+
+                                            <% } else { %>
+
+                                                <option value="" disabled>
+                                                    Nenhum veículo cadastrado
+                                                </option>
+
+                                            <% } %>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- LATITUDE -->
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="latitude"
+                                        class="form-label"
+                                    >
+                                        Latitude
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-compass"></i>
+
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            name="latitude"
+                                            id="latitude"
+                                            class="form-control"
+                                            placeholder="Aguardando localização..."
+                                            readonly
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- LONGITUDE -->
+                                <div class="col-md-6">
+
+                                    <label
+                                        for="longitude"
+                                        class="form-label"
+                                    >
+                                        Longitude
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-compass"></i>
+
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            name="longitude"
+                                            id="longitude"
+                                            class="form-control"
+                                            placeholder="Aguardando localização..."
+                                            readonly
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- STATUS -->
+                            <div
+                                id="statusLocalizacao"
+                                class="status-location alert alert-secondary mt-4"
+                            >
+
+                                <i class="bi bi-info-circle me-2"></i>
+
+                                Clique em "Captar minha localização"
+                                para obter sua posição atual.
+
+                            </div>
+
+
+                            <!-- BOTÕES -->
+                            <div class="actions mt-4">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger"
+                                    onclick="captarLocalizacao()"
+                                    id="btnCaptar"
+                                >
+
+                                    <i class="bi bi-crosshair me-2"></i>
+
+                                    Captar minha localização
+
+                                </button>
+
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger"
+                                    id="btnCadastrar"
+                                    disabled
+                                >
+
+                                    <i class="bi bi-check-lg me-2"></i>
+
+                                    Cadastrar localização
+
+                                </button>
+
+
+                                <a
+                                    href="/localizacaoVeiculo/listar"
+                                    class="btn btn-secondary"
+                                >
+
+                                    <i class="bi bi-x-lg me-2"></i>
+
+                                    Cancelar
+
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+
+    <style>
+
+        .content {
+            min-height: calc(100vh - 60px);
+        }
+
+
+        /* CABEÇALHO */
+
+        .page-header {
+            background: linear-gradient(
+                135deg,
+                #7a1f1f,
+                #a52a2a
+            );
+
+            color: #ffffff;
+
+            border-radius: 14px;
+
+            padding: 26px 30px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow:
+                0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .page-header h1 {
+            margin: 0;
+
+            font-size: 25px;
+
+            font-weight: 700;
+        }
+
+
+        .page-header p {
+            margin: 6px 0 0;
+
+            font-size: 14px;
+
+            opacity: 0.85;
+        }
+
+
+        .page-header .btn {
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+
+        /* CARD */
+
+        .cadastro-card {
+            border-radius: 14px;
+
+            overflow: hidden;
+        }
+
+
+        /* TÍTULO DA SEÇÃO */
+
+        .section-title {
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .section-icon {
+            width: 50px;
+
+            height: 50px;
+
+            background: #f8eaea;
+
+            color: #8b2e2e;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 21px;
+
+            flex-shrink: 0;
+        }
+
+
+        .section-title h4 {
+            margin: 0;
+
+            font-size: 19px;
+
+            font-weight: 700;
+
+            color: #343a40;
+        }
+
+
+        .section-title p {
+            margin: 4px 0 0;
+
+            font-size: 13px;
+
+            color: #7b8187;
+        }
+
+
+        /* LABEL */
+
+        .form-label {
+            font-weight: 600;
+
+            color: #343a40;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* INPUT */
+
+        .input-wrapper {
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+        }
+
+
+        .input-wrapper i {
+            position: absolute;
+
+            left: 14px;
+
+            color: #8b2e2e;
+
+            z-index: 2;
+        }
+
+
+        .input-wrapper .form-control,
+        .input-wrapper .form-select {
+
+            min-height: 46px;
+
+            padding-left: 42px;
+
+            border-radius: 9px;
+
+            border: 1px solid #dee2e6;
+
+            box-shadow: none;
+
+            transition: 0.2s;
+        }
+
+
+        .input-wrapper .form-control:focus,
+        .input-wrapper .form-select:focus {
+
+            border-color: #a52a2a;
+
+            box-shadow:
+                0 0 0 3px rgba(165, 42, 42, 0.10);
+        }
+
+
+        /* STATUS */
+
+        .status-location {
+
+            border-radius: 9px;
+
+            margin-bottom: 0;
+        }
+
+
+        /* BOTÕES */
+
+        .actions {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .actions .btn {
+
+            min-height: 44px;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+
+        .btn-danger {
+
+            background: #8b2e2e;
+
+            border-color: #8b2e2e;
+        }
+
+
+        .btn-danger:hover {
+
+            background: #7a1f1f;
+
+            border-color: #7a1f1f;
+        }
+
+
+        .btn-outline-danger {
+
+            color: #8b2e2e;
+
+            border-color: #8b2e2e;
+        }
+
+
+        .btn-outline-danger:hover {
+
+            background: #8b2e2e;
+
+            border-color: #8b2e2e;
+
+            color: #ffffff;
+        }
+
+
+        /* RESPONSIVO */
+
+        @media (max-width: 768px) {
+
+            .page-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                padding: 22px;
+            }
+
+
+            .page-header .btn {
+
+                width: 100%;
+            }
+
+
+            .cadastro-card .card-body {
+
+                padding: 25px !important;
+            }
+
+
+            .actions {
+
+                flex-direction: column;
+            }
+
+
+            .actions .btn {
+
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+
+    <script>
+
+        function captarLocalizacao() {
+
+            const status =
+                document.getElementById(
+                    'statusLocalizacao'
+                );
+
+            const btnCadastrar =
+                document.getElementById(
+                    'btnCadastrar'
+                );
+
+            const btnCaptar =
+                document.getElementById(
+                    'btnCaptar'
+                );
+
+
+            if (!navigator.geolocation) {
+
+                status.className =
+                    'alert alert-danger status-location mt-4';
+
+                status.innerHTML =
+                    '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                    'Seu navegador não suporta geolocalização.';
+
+                return;
+            }
+
+
+            status.className =
+                'alert alert-warning status-location mt-4';
+
+            status.innerHTML =
+                '<i class="bi bi-hourglass-split me-2"></i>' +
+                'Captando sua localização...';
+
+
+            btnCaptar.disabled = true;
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+
+                    const latitude =
+                        position.coords.latitude;
+
+                    const longitude =
+                        position.coords.longitude;
+
+
+                    document.getElementById(
+                        'latitude'
+                    ).value = latitude;
+
+
+                    document.getElementById(
+                        'longitude'
+                    ).value = longitude;
+
+
+                    status.className =
+                        'alert alert-success status-location mt-4';
+
+                    status.innerHTML =
+                        '<i class="bi bi-check-circle-fill me-2"></i>' +
+                        'Localização captada com sucesso.';
+
+
+                    btnCadastrar.disabled =
+                        false;
+
+                    btnCaptar.disabled =
+                        false;
+
+                },
+
+
+                function (error) {
+
+                    status.className =
+                        'alert alert-danger status-location mt-4';
+
+                    btnCaptar.disabled =
+                        false;
+
+
+                    if (error.code === 1) {
+
+                        status.innerHTML =
+                            '<i class="bi bi-shield-exclamation me-2"></i>' +
+                            'Permissão de localização negada. ' +
+                            'Permita o acesso à localização no navegador.';
+
+                    }
+
+                    else if (error.code === 2) {
+
+                        status.innerHTML =
+                            '<i class="bi bi-geo-alt me-2"></i>' +
+                            'Não foi possível determinar sua localização.';
+
+                    }
+
+                    else if (error.code === 3) {
+
+                        status.innerHTML =
+                            '<i class="bi bi-clock me-2"></i>' +
+                            'A localização demorou muito para ser obtida.';
+
+                    }
+
+                    else {
+
+                        status.innerHTML =
+                            '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                            'Não foi possível obter sua localização.';
+
+                    }
+
+                },
+
+
+                {
+                    enableHighAccuracy: true,
+
+                    timeout: 10000,
+
+                    maximumAge: 0
+                }
+
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>

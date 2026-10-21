@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<body class="bg-light">
+
+    <%- include('../../partials/header') %>
+
+    <% const admin = usuario && usuario.tipo === 'ADMIN'; %>
+
+    <div class="d-flex">
+
+        <%- include('../../partials/sidebar') %>
+
+        <main class="content w-100">
+
+            <style>
+                :root {
+                    --red: #7a1f1f;
+                    --red-dark: #5f1717;
+                    --red-soft: #faf2f2;
+                    --red-border: #ead4d4;
+                    --text: #242424;
+                    --muted: #747474;
+                    --border: #e6e7e9;
+                    --bg: #f5f6f8;
+                }
+
+                .rota-page { min-height: calc(100vh - 70px); padding: 32px; background: var(--bg); }
+
+                /* ===== Cabeçalho ===== */
+                .rota-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+                .rota-title { margin: 0; color: var(--text); font-size: 30px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15; }
+                .rota-description { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+                .rota-acoes { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
+                .btn-nova-rota, .btn-voltar {
+                    height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+                    padding: 0 17px; border-radius: 10px; font-size: 14px; font-weight: 700; text-decoration: none; transition: .18s ease;
+                }
+                .btn-nova-rota { color: #fff; background: var(--red); border: 1px solid var(--red); box-shadow: 0 4px 12px rgba(122, 31, 31, .18); }
+                .btn-nova-rota:hover { color: #fff; background: var(--red-dark); border-color: var(--red-dark); transform: translateY(-1px); }
+                .btn-voltar { color: #555; background: #fff; border: 1px solid #dedfe2; }
+                .btn-voltar:hover { color: var(--red); border-color: var(--red-border); }
+
+                /* ===== Busca ===== */
+                .rota-barra { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+                .rota-busca { position: relative; flex: 1; max-width: 420px; }
+                .rota-busca i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+                .rota-busca input {
+                    width: 100%; height: 44px; padding: 0 14px 0 40px; font-size: 15px; outline: none;
+                    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+                }
+                .rota-busca input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(122, 31, 31, .12); }
+                .rota-total { color: var(--muted); font-size: 13px; }
+
+                /* ===== Lista de rotas ===== */
+                .rota-lista { display: flex; flex-direction: column; gap: 10px; }
+
+                .rota-linha {
+                    display: grid; grid-template-columns: auto 1fr auto auto;
+                    grid-template-areas: "num info tempo acoes";
+                    align-items: center; gap: 16px; padding: 14px 16px;
+                    background: #fff; border: 1px solid var(--border); border-radius: 16px;
+                    transition: border-color .15s ease, box-shadow .15s ease;
+                }
+                .rota-linha:hover { border-color: var(--red-border); box-shadow: 0 6px 20px rgba(122, 31, 31, .08); }
+
+                .rota-num {
+                    grid-area: num; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+                    border-radius: 14px; background: var(--red); color: #fff; font-size: 15px; font-weight: 800;
+                }
+                .rota-info { grid-area: info; min-width: 0; }
+                .rota-nome { color: var(--text); font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+                .rota-codigo { margin-top: 3px; color: #9a9ea5; font-size: 12.5px; }
+
+                .tempo-box { grid-area: tempo; display: inline-flex; align-items: baseline; gap: 5px; padding: 7px 12px; border-radius: 10px; background: var(--red-soft); justify-self: start; }
+                .tempo-rota { color: var(--red); font-size: 15px; font-weight: 800; }
+                .tempo-label { color: #9b7777; font-size: 12px; font-weight: 600; }
+
+                .acoes-rota { grid-area: acoes; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+                .acoes-rota form { margin: 0; }
+
+                .btn-ver-mapa, .btn-rota-editar, .btn-rota-excluir {
+                    height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+                    padding: 0 13px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: .17s ease;
+                }
+                .btn-ver-mapa { color: #fff; background: var(--red); border: 1px solid var(--red); }
+                .btn-ver-mapa:hover { color: #fff; background: var(--red-dark); border-color: var(--red-dark); }
+                .btn-rota-editar { color: #555; background: #fff; border: 1px solid #dedfe2; }
+                .btn-rota-editar:hover { color: var(--red); background: var(--red-soft); border-color: var(--red-border); }
+                .btn-rota-excluir { color: #8b2e2e; background: #fff; border: 1px solid #dfc3c3; }
+                .btn-rota-excluir:hover { color: #fff; background: var(--red); border-color: var(--red); }
+
+                .btn-ver-mapa:focus-visible, .btn-rota-editar:focus-visible, .btn-rota-excluir:focus-visible,
+                .btn-nova-rota:focus-visible, .btn-voltar:focus-visible { outline: 3px solid rgba(122, 31, 31, .35); outline-offset: 2px; }
+
+                /* ===== Vazio ===== */
+                .sem-rotas { padding: 60px 20px; text-align: center; background: #fff; border: 1px dashed var(--red-border); border-radius: 16px; }
+                .sem-rotas-icone { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border-radius: 16px; background: var(--red-soft); color: var(--red); font-size: 24px; }
+                .sem-rotas h5 { margin: 0 0 7px; color: #444; font-size: 16px; font-weight: 700; }
+                .sem-rotas p { margin: 0; color: var(--muted); font-size: 13px; }
+
+                /* ===== Celular ===== */
+                @media (max-width: 768px) {
+                    .rota-page { padding: 20px 14px; }
+                    .rota-header { align-items: stretch; flex-direction: column; gap: 16px; }
+                    .rota-title { font-size: 25px; }
+                    .rota-acoes { width: 100%; }
+                    .btn-nova-rota, .btn-voltar { flex: 1; }
+                    .rota-busca { max-width: none; }
+                    .rota-total { display: none; }
+
+                    .rota-linha {
+                        grid-template-columns: auto 1fr auto;
+                        grid-template-areas: "num info info" "tempo tempo acoes";
+                        gap: 12px; padding: 14px;
+                    }
+                    .rota-num { width: 42px; height: 42px; }
+                    .acoes-rota .rotulo-admin { display: none; }
+                    .btn-rota-editar, .btn-rota-excluir { width: 38px; padding: 0; }
+                }
+            </style>
+
+
+            <div class="rota-page">
+
+                <div class="rota-header">
+
+                    <div>
+                        <h1 class="rota-title">Lista de Rotas</h1>
+                        <p class="rota-description">
+                            <%= admin
+                                ? 'Gerencie as rotas cadastradas no sistema.'
+                                : 'Escolha uma rota para vê-la no mapa.' %>
+                        </p>
+                    </div>
+
+                    <div class="rota-acoes">
+
+                        <% if (admin) { %>
+                            <a href="/rota/cadastrar" class="btn-nova-rota">
+                                <i class="bi bi-plus-lg"></i>
+                                Nova rota
+                            </a>
+                        <% } %>
+
+                        <a href="/dashboard" class="btn-voltar">
+                            <i class="bi bi-arrow-left"></i>
+                            Voltar
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <% if (rotas && rotas.length > 0) { %>
+
+                    <div class="rota-barra">
+                        <div class="rota-busca">
+                            <i class="bi bi-search"></i>
+                            <input id="busca-rota" type="search" placeholder="Buscar rota" autocomplete="off">
+                        </div>
+                        <span class="rota-total" id="rota-total"><%= rotas.length %> <%= rotas.length === 1 ? 'rota' : 'rotas' %></span>
+                    </div>
+
+                    <div class="rota-lista" id="rota-lista">
+
+                        <% rotas.forEach(rota => { %>
+
+                            <div class="rota-linha" data-busca="<%= rota.descricao %> <%= rota.id %>">
+
+                                <div class="rota-num"><%= rota.id %></div>
+
+                                <div class="rota-info">
+                                    <div class="rota-nome"><%= rota.descricao %></div>
+                                    <div class="rota-codigo">Rota #<%= rota.id %></div>
+                                </div>
+
+                                <div class="tempo-box">
+                                    <span class="tempo-rota"><%= rota.tempo_medio %> min</span>
+                                    <span class="tempo-label">em média</span>
+                                </div>
+
+                                <div class="acoes-rota">
+
+                                    <a href="/localizacaoVeiculo/listar?rota=<%= rota.id %>" class="btn-ver-mapa">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        Ver no mapa
+                                    </a>
+
+                                    <% if (admin) { %>
+
+                                        <a href="/rota/editar/<%= rota.id %>" class="btn-rota-editar" aria-label="Editar rota" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                            <span class="rotulo-admin">Editar</span>
+                                        </a>
+
+                                        <form class="form-excluir" action="/rota/excluir/<%= rota.id %>" method="POST">
+                                            <button type="submit" class="btn-rota-excluir" aria-label="Excluir rota" title="Excluir">
+                                                <i class="bi bi-trash"></i>
+                                                <span class="rotulo-admin">Excluir</span>
+                                            </button>
+                                        </form>
+
+                                    <% } %>
+
+                                </div>
+
+                            </div>
+
+                        <% }) %>
+
+                    </div>
+
+                    <div class="sem-rotas" id="sem-resultado" style="display:none">
+                        <div class="sem-rotas-icone"><i class="bi bi-search"></i></div>
+                        <h5>Nenhuma rota encontrada</h5>
+                        <p>Tente buscar por outro nome.</p>
+                    </div>
+
+                <% } else { %>
+
+                    <div class="sem-rotas">
+                        <div class="sem-rotas-icone"><i class="bi bi-signpost-2"></i></div>
+                        <h5>Nenhuma rota cadastrada</h5>
+                        <p>Ainda não existem rotas cadastradas no sistema.</p>
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <%- include('../../partials/scripts') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        // ===== Busca =====
+
+        const campoBusca = document.getElementById('busca-rota');
+
+        if (campoBusca) {
+
+            const norm = (t) => String(t || '').toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            const linhas = document.querySelectorAll('.rota-linha');
+            const semResultado = document.getElementById('sem-resultado');
+            const total = document.getElementById('rota-total');
+
+            campoBusca.addEventListener('input', function () {
+
+                const q = norm(campoBusca.value);
+                let visiveis = 0;
+
+                linhas.forEach(function (linha) {
+                    const mostrar = norm(linha.dataset.busca).includes(q);
+                    linha.style.display = mostrar ? '' : 'none';
+                    if (mostrar) { visiveis++; }
+                });
+
+                semResultado.style.display = visiveis ? 'none' : 'block';
+                total.textContent = visiveis + ' de ' + linhas.length;
+
+            });
+
+        }
+
+        // ===== Exclusão de rota =====
+
+        for (const formExcluir of document.getElementsByClassName('form-excluir')) {
+
+            formExcluir.addEventListener('submit', function (e) {
+
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Deseja realmente excluir?',
+                    text: 'Os vínculos dessa rota com os pontos também serão removidos.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#7a1f1f',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        formExcluir.submit();
+                    }
+                });
+
+            });
+
+        }
+
+    </script>
+
+    <% if (mensagem) { %>
+
+        <script>
+            Swal.fire({
+                icon: '<%= mensagem.tipo %>',
+                title: '<%= mensagem.tituloMensagem || "Aviso" %>',
+                text: '<%= mensagem.valor %>',
+                confirmButtonColor: '#7a1f1f',
+                confirmButtonText: 'OK'
+            });
+        </script>
+
+    <% } %>
+
+</body>
+
+</html>

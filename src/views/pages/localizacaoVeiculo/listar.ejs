@@ -1,0 +1,4501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+    <style>
+        :root {
+            --v: #7a1f1f;
+            --v-dark: #641919;
+            --v-light: #f8e9e9;
+            --tx: #1f2933;
+            --mut: #6b7280;
+            --bd: #e5e7eb;
+            --bg: #f4f6f9;
+            --warning: #d97706;
+            --warning-bg: #fff7ed;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--tx);
+            overflow-x: hidden;
+        }
+
+        .content {
+            padding: 0;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .mapa-area {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            overflow: hidden;
+            background: #e5e7eb;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* =========================================================
+           PAINEL
+        ========================================================= */
+
+        .sheet {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            height: 45%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f6f7f9;
+            border-radius: 26px 26px 0 0;
+            box-shadow: 0 -8px 32px rgba(15, 23, 42, .22);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .sheet-topo {
+            flex: none;
+            padding: 10px 18px 14px;
+            background: #fff;
+            border-bottom: 1px solid #eceff3;
+            touch-action: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .sheet-topo:active {
+            cursor: grabbing;
+        }
+
+        .sheet-handle {
+            width: 42px;
+            height: 5px;
+            border-radius: 3px;
+            background: #cfd4dc;
+            margin: 0 auto 10px;
+        }
+
+        .sheet-topo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            margin: 8px 0 0;
+            color: var(--tx);
+        }
+
+        .sheet-topo p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--mut);
+        }
+
+        .sheet-corpo {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            padding: 14px 14px 22px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* =========================================================
+           STATUS AO VIVO
+        ========================================================= */
+
+        .live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--success);
+            background: var(--success-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .live .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #16a34a;
+            animation: pulso 1.6s infinite;
+        }
+
+        .live-mot {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, .16);
+        }
+
+        @keyframes pulso {
+            0% {
+                box-shadow: 0 0 0 0 rgba(22, 163, 74, .55);
+            }
+
+            100% {
+                box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
+            }
+        }
+
+        /* =========================================================
+           BUSCA
+        ========================================================= */
+
+        .busca {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .busca i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--mut);
+            pointer-events: none;
+        }
+
+        .busca input {
+            width: 100%;
+            border: 1px solid var(--bd);
+            background: #fff;
+            border-radius: 12px;
+            padding: 13px 14px 13px 40px;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+        }
+
+        .busca input:focus {
+            border-color: var(--v);
+            box-shadow: 0 0 0 3px rgba(122, 31, 31, .10);
+        }
+
+        /* =========================================================
+           ABAS
+        ========================================================= */
+
+        .abas {
+            display: flex;
+            background: #e6e9ee;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        .abas button {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            padding: 9px 4px;
+            border-radius: 9px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--mut);
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .abas button:hover {
+            color: var(--v);
+        }
+
+        .abas button.ativa {
+            background: #fff;
+            color: var(--v);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+        }
+
+        /* =========================================================
+           CIDADES - ROLAGEM HORIZONTAL
+        ========================================================= */
+
+        .chips-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 2px 2px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #c5c9d0 transparent;
+            cursor: grab;
+            user-select: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x;
+        }
+
+        .chips.arrastando {
+            cursor: grabbing;
+        }
+
+        .chips::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .chips::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chips::-webkit-scrollbar-thumb {
+            background: #c5c9d0;
+            border-radius: 10px;
+        }
+
+        .chips::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        .chips button {
+            flex: none;
+            border: 1px solid var(--bd);
+            background: #fff;
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: .15s ease;
+        }
+
+        .chips button:hover {
+            border-color: #c7cbd1;
+        }
+
+        .chips button.ativa {
+            background: var(--v);
+            border-color: var(--v);
+            color: #fff;
+        }
+
+        /* =========================================================
+           ITENS
+        ========================================================= */
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #eceff3;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform .12s, border-color .12s, background .12s;
+        }
+
+        .item:hover {
+            border-color: #d5d9df;
+        }
+
+        .item:active {
+            transform: scale(.985);
+        }
+
+        .item.ativo {
+            border-color: var(--v);
+            background: #fdf4f4;
+        }
+
+        .item-ico {
+            flex: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .item-ico.bus {
+            background: var(--v);
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .item-ico.rota {
+            background: var(--v-light);
+            color: var(--v);
+            font-size: 19px;
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-info strong {
+            display: block;
+            font-size: 15px;
+            color: var(--tx);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-info span {
+            display: block;
+            font-size: 12.5px;
+            color: var(--mut);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .item-go {
+            flex: none;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .item.ativo .item-go {
+            color: var(--v);
+        }
+
+        .vazio {
+            padding: 22px 10px;
+            text-align: center;
+            color: var(--mut);
+            font-size: 14px;
+        }
+
+        /* =========================================================
+           ETA
+        ========================================================= */
+
+        .eta {
+            flex: none;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            background: #f3f4f6;
+            color: #4b5563;
+            white-space: nowrap;
+        }
+
+        .eta-agora {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .eta-perto {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /* =========================================================
+           ALERTAS DOS ÔNIBUS
+        ========================================================= */
+
+        .bus-alerta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 5px;
+            color: #b45309 !important;
+            font-size: 11.5px !important;
+            font-weight: 700;
+        }
+
+        .bus-alerta i {
+            font-size: 12px;
+        }
+
+        .bus-alerta.alto {
+            color: #dc2626 !important;
+        }
+
+        .bus-alerta.info {
+            color: #2563eb !important;
+        }
+
+        .alerta-card {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 11px;
+            background: var(--warning-bg);
+            border: 1px solid #fed7aa;
+        }
+
+        .alerta-card.danger {
+            background: var(--danger-bg);
+            border-color: #fecaca;
+        }
+
+        .alerta-card.info {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .alerta-card-icone {
+            flex: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fed7aa;
+            color: #b45309;
+        }
+
+        .alerta-card.danger .alerta-card-icone {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .alerta-card.info .alerta-card-icone {
+            background: #bfdbfe;
+            color: #2563eb;
+        }
+
+        .alerta-card-info {
+            min-width: 0;
+        }
+
+        .alerta-card-info strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .alerta-card-info span {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.35;
+        }
+
+        /* =========================================================
+           RESUMO ADMIN
+        ========================================================= */
+
+        .resumo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .resumo > div {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #eceff3;
+            border-radius: 14px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .resumo strong {
+            display: block;
+            font-size: 22px;
+            color: var(--v);
+        }
+
+        .resumo small {
+            color: var(--mut);
+        }
+
+        /* =========================================================
+           FAB
+        ========================================================= */
+
+        .fabs {
+            position: absolute;
+            right: 12px;
+            bottom: calc(var(--sh, 300px) + 14px);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .fab {
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 50%;
+            background: #fff;
+            color: var(--v);
+            font-size: 19px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .fab:active {
+            background: #f3f4f6;
+        }
+
+        .btn-voltar-mapa {
+            border-radius: 12px;
+            font-weight: 600;
+            border: 0;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, .20);
+        }
+
+        /* =========================================================
+           MARCADORES
+        ========================================================= */
+
+        .bus-pin {
+            width: 66px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #9b2a2a, #6a1818);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            border: 2px solid #fff;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .bus-pin.meu {
+            background: #f59e0b;
+            color: #1f2933;
+            border-color: #1f2933;
+            transform: scale(1.2);
+        }
+
+        .bus-pin.alerta {
+            box-shadow:
+                0 0 0 3px rgba(217, 119, 6, .30),
+                0 3px 10px rgba(0, 0, 0, .35);
+        }
+
+        .bus-pin.alerta-danger {
+            box-shadow:
+                0 0 0 3px rgba(220, 38, 38, .35),
+                0 3px 10px rgba(0, 0, 0, .35);
+        }
+
+        .modo-motorista .bus-pin:not(.meu) {
+            opacity: .45;
+        }
+
+        .ponto-pin {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #f59e0b;
+            color: var(--tx);
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+            box-sizing: border-box;
+        }
+
+        .parada-pin {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--v);
+            color: #fff;
+            border: 3px solid #fff;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+        }
+
+        .usuario-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #2563eb;
+            border: 4px solid #fff;
+            box-sizing: border-box;
+            box-shadow:
+                0 0 0 6px rgba(37, 99, 235, .25),
+                0 2px 8px rgba(0, 0, 0, .3);
+            animation: pulsoAzul 2s infinite;
+        }
+
+        @keyframes pulsoAzul {
+            0% {
+                box-shadow:
+                    0 0 0 0 rgba(37, 99, 235, .5),
+                    0 2px 8px rgba(0, 0, 0, .3);
+            }
+
+            100% {
+                box-shadow:
+                    0 0 0 16px rgba(37, 99, 235, 0),
+                    0 2px 8px rgba(0, 0, 0, .3);
+            }
+        }
+
+        /* =========================================================
+           POPUP
+        ========================================================= */
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, .25);
+        }
+
+        .leaflet-popup-content {
+            margin: 14px 16px;
+        }
+
+        .pp h5 {
+            margin: 0 0 2px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--v);
+        }
+
+        .pp small {
+            color: var(--mut);
+        }
+
+        .pp p {
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        .eta-card {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #f6f6f6;
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           AVISO
+        ========================================================= */
+
+        .aviso {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #fff;
+            border-left: 5px solid var(--v);
+            border-radius: 12px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, .25);
+            font-size: 14px;
+            color: var(--tx);
+        }
+
+        .aviso span {
+            flex: 1;
+        }
+
+        .aviso button {
+            flex: none;
+            border: 0;
+            background: var(--v);
+            color: #fff;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           BANNER DA ROTA
+        ========================================================= */
+
+        .rota-banner {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            z-index: 999;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: var(--v);
+            color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+        }
+
+        .rb-ico {
+            flex: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+        }
+
+        .rb-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rb-info strong {
+            display: block;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rb-info span {
+            display: block;
+            font-size: 12.5px;
+            opacity: .85;
+        }
+
+        .rota-banner button {
+            flex: none;
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .2);
+            color: #fff;
+        }
+
+        .com-rota .aviso {
+            top: 76px;
+        }
+
+        /* =========================================================
+           MOTORISTA
+        ========================================================= */
+
+        .sheet-mot {
+            background: #f3f4f6;
+        }
+
+        .sheet-mot .sheet-topo {
+            background: #1f2933;
+            border-bottom-color: #374151;
+        }
+
+        .sheet-mot .sheet-topo h1 {
+            color: #fff;
+        }
+
+        .sheet-mot .sheet-topo p {
+            color: #9ca3af;
+        }
+
+        .sheet-mot .sheet-handle {
+            background: #4b5563;
+        }
+
+        .modo-motorista [data-aba="onibus"] {
+            display: none;
+        }
+
+        .mot-hero {
+            background: linear-gradient(145deg, #1f2933, #3b4654);
+            color: #fff;
+            border-radius: 22px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 18px rgba(31, 41, 51, .35);
+        }
+
+        .mot-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .mot-bus {
+            font-weight: 800;
+            font-size: 15px;
+            background: #f59e0b;
+            color: #1f2933;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .mot-status {
+            font-size: 13px;
+            font-weight: 700;
+            color: #bbf7d0;
+        }
+
+        .mot-rot {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .mot-ponto {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.25;
+            margin: 2px 0 10px;
+        }
+
+        .mot-eta-linha {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .mot-eta-linha strong {
+            font-size: 40px;
+            font-weight: 800;
+            color: #fbbf24;
+            line-height: 1;
+        }
+
+        .mot-eta-linha span {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .mot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .mot-grid > div {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 14px;
+            padding: 10px;
+            min-width: 0;
+        }
+
+        .mot-grid b {
+            display: block;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mot-grid small {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .mot-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #f59e0b;
+            color: #1f2933;
+            font-weight: 700;
+            border-radius: 14px;
+            padding: 12px;
+            text-decoration: none;
+        }
+
+        /* =========================================================
+           DESKTOP
+        ========================================================= */
+
+        @media (min-width: 992px) {
+
+            .sheet {
+                left: 16px;
+                top: 16px;
+                bottom: 16px;
+                right: auto;
+                width: 380px;
+                height: auto !important;
+                border-radius: 20px;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, .22);
+            }
+
+            .sheet-topo {
+                cursor: default;
+                touch-action: auto;
+            }
+
+            .sheet-handle {
+                display: none;
+            }
+
+            .fabs {
+                bottom: 24px !important;
+            }
+
+            .aviso {
+                left: 412px;
+                right: 72px;
+            }
+
+            .rota-banner {
+                left: 412px;
+                right: 72px;
+            }
+
+            .com-rota .aviso {
+                left: 412px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .mapa-area {
+                min-height: 500px;
+            }
+
+            .sheet-topo {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .sheet-corpo {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .fabs {
+                right: 10px;
+            }
+
+            .btn-voltar-mapa {
+                padding: 8px 12px !important;
+                font-size: 12px;
+            }
+
+            .item {
+                padding: 11px;
+            }
+
+            .item-ico {
+                width: 40px;
+                height: 40px;
+            }
+
+            .eta {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <%- include('../../partials/header') %>
+
+        <%
+            const ehMotorista =
+                typeof usuario !== 'undefined' &&
+                usuario &&
+                usuario.tipo === 'MOTORISTA';
+        %>
+
+        <div class="d-flex">
+
+            <%- include('../../partials/sidebar') %>
+
+                <main class="content">
+
+                    <div
+                        class="mapa-area <%= ehMotorista ? 'modo-motorista' : '' %>"
+                        id="mapa-area"
+                    >
+
+                        <div id="map"></div>
+
+                        <div
+                            class="aviso"
+                            id="aviso"
+                            style="display:none"
+                        ></div>
+
+                        <div
+                            class="rota-banner"
+                            id="rota-banner"
+                        >
+                            <div class="rb-ico">
+                                <i class="bi bi-signpost-split"></i>
+                            </div>
+
+                            <div class="rb-info">
+                                <strong id="rb-titulo"></strong>
+                                <span id="rb-sub"></span>
+                            </div>
+
+                            <button
+                                type="button"
+                                onclick="limparRota()"
+                                aria-label="Limpar rota"
+                            >
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="fabs">
+
+                            <a
+                                href="/dashboard"
+                                class="btn btn-light px-4 shadow-sm btn-voltar-mapa"
+                            >
+                                Voltar para a página inicial
+                            </a>
+
+                        </div>
+
+                        <div
+                            class="sheet <%= ehMotorista ? 'sheet-mot' : '' %>"
+                            id="sheet"
+                        >
+
+                            <div
+                                class="sheet-topo"
+                                id="sheet-topo"
+                            >
+
+                                <div class="sheet-handle"></div>
+
+                                <% if (ehMotorista) { %>
+
+                                    <span class="live live-mot">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                        Painel do motorista
+                                    </span>
+
+                                    <h1>Minha viagem</h1>
+
+                                    <p>
+                                        Seu ônibus, próximo ponto e passageiros
+                                    </p>
+
+                                <% } else { %>
+
+                                    <span class="live">
+                                        <span class="dot"></span>
+                                        Ao vivo
+                                    </span>
+
+                                    <h1>Monitoramento em tempo real</h1>
+
+                                    <p>
+                                        Ônibus, pontos e previsão de chegada
+                                    </p>
+
+                                <% } %>
+
+                            </div>
+
+                            <div class="sheet-corpo">
+
+                                <% if (ehMotorista) { %>
+
+                                    <div class="mot-hero">
+
+                                        <div class="mot-topo">
+
+                                            <span
+                                                class="mot-bus"
+                                                id="numero-motorista"
+                                            >
+                                                Ônibus 101
+                                            </span>
+
+                                            <span
+                                                class="mot-status"
+                                                id="status-motorista"
+                                            >
+                                                Em operação
+                                            </span>
+
+                                        </div>
+
+                                        <small class="mot-rot">
+                                            Próximo ponto
+                                        </small>
+
+                                        <div
+                                            class="mot-ponto"
+                                            id="proximo-ponto-motorista"
+                                        >
+                                            Calculando...
+                                        </div>
+
+                                        <div class="mot-eta-linha">
+
+                                            <strong id="eta-motorista">
+                                                --
+                                            </strong>
+
+                                            <span id="dist-motorista"></span>
+
+                                        </div>
+
+                                        <div class="mot-grid">
+
+                                            <div>
+                                                <b id="aguardando-motorista">
+                                                    --
+                                                </b>
+
+                                                <small>
+                                                    passageiros aguardando
+                                                </small>
+                                            </div>
+
+                                            <div>
+                                                <b id="localizacao-motorista">
+                                                    Obtendo...
+                                                </b>
+
+                                                <small>
+                                                    sua posição (GPS)
+                                                </small>
+                                            </div>
+
+                                        </div>
+
+                                        <a
+                                            href="/localizacaoVeiculo/cadastrar"
+                                            class="mot-btn"
+                                        >
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            Cadastrar minha localização
+                                        </a>
+
+                                    </div>
+
+                                <% } %>
+
+                                <% if (
+                                    typeof usuario !== 'undefined' &&
+                                    usuario &&
+                                    usuario.tipo === 'ADMIN'
+                                ) { %>
+
+                                    <div class="resumo">
+
+                                        <div>
+                                            <strong id="contador-onibus">
+                                                0
+                                            </strong>
+                                            <small>Ônibus</small>
+                                        </div>
+
+                                        <div>
+                                            <strong id="contador-pontos">
+                                                0
+                                            </strong>
+                                            <small>Pontos</small>
+                                        </div>
+
+                                    </div>
+
+                                <% } %>
+
+                                <div class="busca">
+
+                                    <i class="bi bi-search"></i>
+
+                                    <input
+                                        id="busca"
+                                        type="search"
+                                        placeholder="Buscar ponto, cidade ou ônibus"
+                                        autocomplete="off"
+                                    >
+
+                                </div>
+
+                                <div class="abas">
+
+                                    <button
+                                        type="button"
+                                        class="ativa"
+                                        data-aba="pontos"
+                                    >
+                                        Pontos
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-aba="onibus"
+                                    >
+                                        Ônibus
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-aba="rotas"
+                                    >
+                                        Rotas
+                                    </button>
+
+                                </div>
+
+                                <div
+                                    class="chips-wrapper"
+                                    id="chips-wrapper"
+                                >
+
+                                    <div
+                                        class="chips"
+                                        id="chips-cidades"
+                                    ></div>
+
+                                </div>
+
+                                <div id="lista-pontos"></div>
+
+                                <div
+                                    id="lista-onibus"
+                                    style="display:none"
+                                ></div>
+
+                                <div
+                                    id="lista-rotas"
+                                    style="display:none"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </main>
+
+        </div>
+
+        <%- include('../../partials/scripts') %>
+
+            <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+            <script id="rotas-data" type="application/json">
+                <%- JSON.stringify(typeof rotas !== 'undefined' ? rotas : []) %>
+            </script>
+
+            <script>
+
+                /* =========================================================
+                   DADOS INICIAIS
+                ========================================================= */
+
+                const rotas = JSON.parse(
+                    document.getElementById('rotas-data').textContent
+                );
+
+                const tipoUsuario =
+                    "<%= typeof usuario !== 'undefined' && usuario ? usuario.tipo : '' %>";
+
+                const POSICAO_PADRAO = [-20.2111, -50.9258];
+
+                const VELOCIDADE_ONIBUS = 8;
+
+                const TEMPO_PARADA = 8;
+
+                const FATOR_RUA = 1.3;
+
+                const map = L.map('map', {
+                    zoomControl: false
+                }).setView(POSICAO_PADRAO, 13);
+
+                L.tileLayer(
+                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap'
+                    }
+                ).addTo(map);
+
+                const ehDesktop = () => window.innerWidth >= 992;
+
+                const areaMapa =
+                    document.getElementById('mapa-area');
+
+                const sheet =
+                    document.getElementById('sheet');
+
+                let estadoSheet = 'mid';
+
+                let abaAtual = 'pontos';
+
+                let cidadeAtual = 'Todas';
+
+                let termoBusca = '';
+
+                const cacheHTML = {};
+
+                let rotaAtiva = null;
+
+                if (ehDesktop()) {
+                    L.control.zoom({
+                        position: 'topright'
+                    }).addTo(map);
+                }
+
+                /* =========================================================
+                   FUNÇÕES DE DISTÂNCIA
+                ========================================================= */
+
+                function metros(a, b) {
+
+                    const R = 6371000;
+
+                    const rad = Math.PI / 180;
+
+                    const dLat =
+                        (b[0] - a[0]) * rad;
+
+                    const dLng =
+                        (b[1] - a[1]) * rad;
+
+                    const x =
+                        Math.sin(dLat / 2) ** 2 +
+                        Math.cos(a[0] * rad) *
+                        Math.cos(b[0] * rad) *
+                        Math.sin(dLng / 2) ** 2;
+
+                    return 2 * R *
+                        Math.asin(Math.sqrt(x));
+                }
+
+                function formatarDistancia(m) {
+
+                    return m < 1000
+                        ? Math.max(
+                            10,
+                            Math.round(m / 10) * 10
+                        ) + ' m'
+                        : (
+                            m / 1000
+                        ).toFixed(1)
+                            .replace('.', ',') + ' km';
+                }
+
+                const norm = (t) =>
+                    String(t || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '');
+
+                /* =========================================================
+                   ÍCONES
+                ========================================================= */
+
+                function ehMeuOnibus(bus) {
+
+                    return (
+                        tipoUsuario === 'MOTORISTA' &&
+                        bus === onibus[0]
+                    );
+                }
+
+                function criarIconeOnibus(numero, meu, alerta) {
+
+                    let classe = '';
+
+                    if (alerta) {
+                        classe += ' alerta';
+
+                        if (alerta.nivel === 'danger') {
+                            classe += ' alerta-danger';
+                        }
+                    }
+
+                    if (meu) {
+                        classe += ' meu';
+                    }
+
+                    return L.divIcon({
+
+                        className: '',
+
+                        html: `
+                            <div class="bus-pin ${classe}">
+                                <i class="bi bi-bus-front-fill"></i>
+                                ${numero}
+                            </div>
+                        `,
+
+                        iconSize: [66, 30],
+
+                        iconAnchor: [33, 15]
+
+                    });
+                }
+
+                function criarIconePonto(qtd) {
+
+                    return L.divIcon({
+
+                        className: '',
+
+                        html: `
+                            <div class="ponto-pin">
+                                ${qtd}
+                            </div>
+                        `,
+
+                        iconSize: [30, 30],
+
+                        iconAnchor: [15, 15]
+
+                    });
+                }
+
+                const usuarioIcon = L.divIcon({
+
+                    className: '',
+
+                    html:
+                        '<div class="usuario-marker"></div>',
+
+                    iconSize: [30, 30],
+
+                    iconAnchor: [15, 15]
+
+                });
+
+                /* =========================================================
+                   LOCALIZAÇÃO
+                ========================================================= */
+
+                let marcadorUsuario = null;
+
+                let posicaoUsuario = null;
+
+                let centralizouUsuario = false;
+
+                let watchId = null;
+
+                function mostrarAviso(msg, tentarDeNovo) {
+
+                    const el =
+                        document.getElementById('aviso');
+
+                    el.innerHTML =
+                        '<span>' +
+                        msg +
+                        '</span>' +
+
+                        (
+                            tentarDeNovo
+                                ? `
+                                    <button
+                                        type="button"
+                                        onclick="obterLocalizacao()"
+                                    >
+                                        Tentar de novo
+                                    </button>
+                                `
+                                : ''
+                        );
+
+                    el.style.display = 'flex';
+                }
+
+                function esconderAviso() {
+
+                    document.getElementById(
+                        'aviso'
+                    ).style.display = 'none';
+                }
+
+                function mostrarUsuario(
+                    latitude,
+                    longitude
+                ) {
+
+                    posicaoUsuario = [
+                        latitude,
+                        longitude
+                    ];
+
+                    if (!marcadorUsuario) {
+
+                        marcadorUsuario =
+                            L.marker(
+                                posicaoUsuario,
+                                {
+                                    icon: usuarioIcon
+                                }
+                            ).addTo(map);
+
+                        marcadorUsuario.bindPopup(`
+                            <div class="pp">
+                                <h5>Você está aqui</h5>
+                            </div>
+                        `);
+
+                    } else {
+
+                        marcadorUsuario.setLatLng(
+                            posicaoUsuario
+                        );
+                    }
+
+                    if (!centralizouUsuario) {
+
+                        centralizouUsuario = true;
+
+                        map.flyTo(
+                            posicaoUsuario,
+                            16,
+                            {
+                                duration: 1
+                            }
+                        );
+                    }
+
+                    if (
+                        tipoUsuario === 'MOTORISTA'
+                    ) {
+
+                        const el =
+                            document.getElementById(
+                                'localizacao-motorista'
+                            );
+
+                        if (el) {
+
+                            el.textContent =
+                                latitude.toFixed(5) +
+                                ', ' +
+                                longitude.toFixed(5);
+                        }
+                    }
+                }
+
+                function erroLocalizacao(err) {
+
+                    let msg =
+                        'Não foi possível obter sua localização.';
+
+                    if (err.code === 1) {
+
+                        msg =
+                            'Permissão negada. Libere a localização para este site nas configurações do navegador.';
+
+                    } else if (err.code === 2) {
+
+                        msg =
+                            'Sinal de GPS indisponível. Vá para um local aberto e tente de novo.';
+
+                    } else if (err.code === 3) {
+
+                        msg =
+                            'A localização demorou demais para responder.';
+                    }
+
+                    mostrarAviso(
+                        msg,
+                        true
+                    );
+                }
+
+                function obterLocalizacao() {
+
+                    if (!navigator.geolocation) {
+
+                        mostrarAviso(
+                            'Este navegador não suporta localização.',
+                            false
+                        );
+
+                        return;
+                    }
+
+                    if (!window.isSecureContext) {
+
+                        mostrarAviso(
+                            'O celular só libera a localização em site seguro. Abra o Bus Status por um link https://.',
+                            false
+                        );
+
+                        return;
+                    }
+
+                    if (watchId !== null) {
+
+                        navigator.geolocation.clearWatch(
+                            watchId
+                        );
+                    }
+
+                    esconderAviso();
+
+                    watchId =
+                        navigator.geolocation.watchPosition(
+
+                            function (pos) {
+
+                                esconderAviso();
+
+                                mostrarUsuario(
+                                    pos.coords.latitude,
+                                    pos.coords.longitude
+                                );
+                            },
+
+                            erroLocalizacao,
+
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 15000,
+                                maximumAge: 5000
+                            }
+
+                        );
+                }
+
+                /* =========================================================
+                   PONTOS
+                ========================================================= */
+
+                const pontosPassageiros = [
+
+                    {
+                        nome: "Ponto Centro - Santa Fé do Sul",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.2107305,
+                        longitude: -50.9277761,
+                        passageiros: 10
+                    },
+
+                    {
+                        nome: "Ponto Rodoviária - Santa Fé do Sul",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.216631,
+                        longitude: -50.9284286,
+                        passageiros: 6
+                    },
+
+                    {
+                        nome: "Ponto Universidade - Santa Fé do Sul",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.207547,
+                        longitude: -50.923447,
+                        passageiros: 14
+                    },
+
+                    {
+                        nome: "Ponto Ginásio - Santa Fé do Sul",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.2137813,
+                        longitude: -50.9248056,
+                        passageiros: 8
+                    },
+
+                    {
+                        nome: "Ponto Parque dos Sonhos - Santa Fé do Sul",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.2057675,
+                        longitude: -50.9436502,
+                        passageiros: 4
+                    },
+
+                    {
+                        nome: "Ponto Vila Lobos",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.220267,
+                        longitude: -50.9206438,
+                        passageiros: 7
+                    },
+
+                    {
+                        nome: "Ponto Avenida Navarro",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.205617,
+                        longitude: -50.9264156,
+                        passageiros: 5
+                    },
+
+                    {
+                        nome: "Ponto L7 Escola de Artes",
+                        cidade: "Santa Fé do Sul",
+                        latitude: -20.2128224,
+                        longitude: -50.9153505,
+                        passageiros: 6
+                    },
+
+                    {
+                        nome: "Ponto Centro - Rubinéia",
+                        cidade: "Rubinéia",
+                        latitude: -20.1763707,
+                        longitude: -51.0075049,
+                        passageiros: 9
+                    },
+
+                    {
+                        nome: "Ponto Prefeitura - Rubinéia",
+                        cidade: "Rubinéia",
+                        latitude: -20.1712327,
+                        longitude: -50.9983214,
+                        passageiros: 5
+                    },
+
+                    {
+                        nome: "Ponto Entrada - Rubinéia",
+                        cidade: "Rubinéia",
+                        latitude: -20.1742592,
+                        longitude: -50.999771,
+                        passageiros: 6
+                    },
+
+                    {
+                        nome: "Ponto Prainha - Rubinéia",
+                        cidade: "Rubinéia",
+                        latitude: -20.1791407,
+                        longitude: -51.0091061,
+                        passageiros: 12
+                    },
+
+                    {
+                        nome: "Ponto Creche São Judas - Três Fronteiras",
+                        cidade: "Três Fronteiras",
+                        latitude: -20.23436,
+                        longitude: -50.89053,
+                        passageiros: 8
+                    },
+
+                    {
+                        nome: "Ponto Prefeitura - Três Fronteiras",
+                        cidade: "Três Fronteiras",
+                        latitude: -20.2327995,
+                        longitude: -50.8850593,
+                        passageiros: 5
+                    },
+
+                    {
+                        nome: "Ponto ida para Santa Fé do Sul - Três Fronteiras",
+                        cidade: "Três Fronteiras",
+                        latitude: -20.2319673,
+                        longitude: -50.8866722,
+                        passageiros: 7
+                    },
+
+                    {
+                        nome: "Ponto Residencial Santa Bárbara",
+                        cidade: "Três Fronteiras",
+                        latitude: -20.23180,
+                        longitude: -50.89500,
+                        passageiros: 4
+                    }
+
+                ];
+
+                pontosPassageiros.forEach(
+                    function (p, i) {
+                        p.id = i;
+                    }
+                );
+
+                const marcadoresPontos = [];
+
+                pontosPassageiros.forEach(
+                    function (ponto) {
+
+                        const marker =
+                            L.marker(
+                                [
+                                    ponto.latitude,
+                                    ponto.longitude
+                                ],
+                                {
+                                    icon:
+                                        criarIconePonto(
+                                            ponto.passageiros
+                                        )
+                                }
+                            ).addTo(map);
+
+                        marker.bindPopup(
+                            function () {
+                                return criarPopupPonto(
+                                    ponto
+                                );
+                            }
+                        );
+
+                        marcadoresPontos.push({
+                            marker: marker,
+                            dados: ponto
+                        });
+                    }
+                );
+
+                /* =========================================================
+                   ALERTAS SIMULADOS
+                ========================================================= */
+
+                const ALERTAS_SIMULADOS = [
+
+                    {
+                        tipo: 'Trânsito',
+                        mensagem: 'Trânsito intenso no trajeto. A previsão pode sofrer pequeno atraso.',
+                        nivel: 'warning',
+                        icone: 'bi-cone-striped'
+                    },
+
+                    {
+                        tipo: 'Atraso',
+                        mensagem: 'Ônibus com atraso estimado de alguns minutos.',
+                        nivel: 'warning',
+                        icone: 'bi-clock-history'
+                    },
+
+                    {
+                        tipo: 'Lotação',
+                        mensagem: 'Alta demanda de passageiros neste ônibus.',
+                        nivel: 'warning',
+                        icone: 'bi-people-fill'
+                    },
+
+                    {
+                        tipo: 'Informativo',
+                        mensagem: 'Operação normal. Veículo seguindo para o próximo ponto.',
+                        nivel: 'info',
+                        icone: 'bi-info-circle-fill'
+                    },
+
+                    {
+                        tipo: 'Atenção',
+                        mensagem: 'Reduza a velocidade devido às condições do trajeto.',
+                        nivel: 'danger',
+                        icone: 'bi-exclamation-triangle-fill'
+                    },
+
+                    {
+                        tipo: 'Informativo',
+                        mensagem: 'Embarque sendo realizado no próximo ponto.',
+                        nivel: 'info',
+                        icone: 'bi-person-walking'
+                    }
+
+                ];
+
+                /* =========================================================
+                   ÔNIBUS
+                ========================================================= */
+
+                const INICIO_ONIBUS = [
+
+                    [101, -20.2080, -50.9280, 0],
+
+                    [102, -20.2140, -50.9220, 2],
+
+                    [103, -20.2180, -50.9290, 3],
+
+                    [104, -20.2040, -50.9200, 4],
+
+                    [105, -20.2100, -50.9160, 5],
+
+                    [106, -20.2020, -50.9250, 6],
+
+                    [107, -20.1760, -51.0070, 7],
+
+                    [108, -20.1730, -51.0035, 10],
+
+                    [109, -20.2320, -50.8920, 11],
+
+                    [110, -20.2260, -50.8980, 13],
+
+                    [111, -20.2350, -50.8870, 12],
+
+                    [112, -20.2150, -50.9300, 1]
+
+                ];
+
+                const onibus =
+                    INICIO_ONIBUS.map(
+                        function (d, indice) {
+
+                            return {
+
+                                numero: d[0],
+
+                                latitude: d[1],
+
+                                longitude: d[2],
+
+                                destinoIndex: d[3],
+
+                                rota: [],
+
+                                indiceRota: 0,
+
+                                distRestante: null,
+
+                                espera: 0,
+
+                                aCaminho: true,
+
+                                versaoRota: 0,
+
+                                marker: null,
+
+                                alerta: null,
+
+                                indiceAlerta: indice % ALERTAS_SIMULADOS.length
+                            };
+                        }
+                    );
+
+                /* =========================================================
+                   ATUALIZAR ALERTAS SIMULADOS
+                ========================================================= */
+
+                function atualizarAlertasSimulados() {
+
+                    const ciclo =
+                        Math.floor(
+                            Date.now() / 12000
+                        );
+
+                    onibus.forEach(
+                        function (bus, indice) {
+
+                            /*
+                             * Alguns ônibus ficam sem alerta,
+                             * enquanto outros recebem alertas.
+                             *
+                             * Isso deixa o mapa mais realista.
+                             */
+
+                            const deveTerAlerta =
+                                (
+                                    (ciclo + indice) % 4 !== 0
+                                );
+
+                            if (!deveTerAlerta) {
+
+                                bus.alerta = null;
+
+                            } else {
+
+                                const posicao =
+                                    (
+                                        ciclo +
+                                        indice
+                                    ) %
+                                    ALERTAS_SIMULADOS.length;
+
+                                bus.alerta =
+                                    ALERTAS_SIMULADOS[
+                                        posicao
+                                    ];
+                            }
+
+                            if (bus.marker) {
+
+                                bus.marker.setIcon(
+                                    criarIconeOnibus(
+                                        bus.numero,
+                                        ehMeuOnibus(bus),
+                                        bus.alerta
+                                    )
+                                );
+                            }
+                        }
+                    );
+                }
+
+                const marcadoresOnibus = [];
+
+                onibus.forEach(
+                    function (bus) {
+
+                        bus.marker =
+                            L.marker(
+                                [
+                                    bus.latitude,
+                                    bus.longitude
+                                ],
+                                {
+                                    icon:
+                                        criarIconeOnibus(
+                                            bus.numero,
+                                            ehMeuOnibus(bus),
+                                            bus.alerta
+                                        ),
+
+                                    zIndexOffset:
+                                        ehMeuOnibus(bus)
+                                            ? 1000
+                                            : 0
+                                }
+                            ).addTo(map);
+
+                        bus.marker.bindPopup(
+                            function () {
+                                return criarPopupOnibus(
+                                    bus
+                                );
+                            }
+                        );
+
+                        marcadoresOnibus.push({
+                            marker: bus.marker,
+                            dados: bus
+                        });
+                    }
+                );
+
+                atualizarAlertasSimulados();
+
+                /* =========================================================
+                   DESTINO E ETA
+                ========================================================= */
+
+                function obterDestino(bus) {
+
+                    return pontosPassageiros[
+                        bus.destinoIndex
+                    ];
+                }
+
+                function distRestanteDoOnibus(bus) {
+
+                    if (bus.distRestante !== null) {
+                        return bus.distRestante;
+                    }
+
+                    const d =
+                        obterDestino(bus);
+
+                    return metros(
+                        [
+                            bus.latitude,
+                            bus.longitude
+                        ],
+                        [
+                            d.latitude,
+                            d.longitude
+                        ]
+                    ) * FATOR_RUA;
+                }
+
+                function segundosAtePonto(
+                    bus,
+                    idxPonto
+                ) {
+
+                    const n =
+                        pontosPassageiros.length;
+
+                    let seg =
+                        bus.espera > 0
+                            ? 0
+                            :
+                            distRestanteDoOnibus(bus) /
+                            VELOCIDADE_ONIBUS;
+
+                    let atual =
+                        bus.destinoIndex;
+
+                    let passos = 0;
+
+                    while (
+                        atual !== idxPonto &&
+                        passos < n
+                    ) {
+
+                        const prox =
+                            (atual + 1) % n;
+
+                        const a =
+                            pontosPassageiros[atual];
+
+                        const b =
+                            pontosPassageiros[prox];
+
+                        seg +=
+                            (
+                                atual ===
+                                bus.destinoIndex &&
+                                bus.espera > 0
+                            )
+                                ? bus.espera
+                                : TEMPO_PARADA;
+
+                        seg +=
+                            metros(
+                                [
+                                    a.latitude,
+                                    a.longitude
+                                ],
+                                [
+                                    b.latitude,
+                                    b.longitude
+                                ]
+                            ) *
+                            FATOR_RUA /
+                            VELOCIDADE_ONIBUS;
+
+                        atual = prox;
+
+                        passos++;
+                    }
+
+                    return seg;
+                }
+
+                function infoETA(
+                    seg,
+                    noPonto
+                ) {
+
+                    if (noPonto) {
+
+                        return {
+                            t: 'No ponto',
+                            c: 'eta-agora'
+                        };
+                    }
+
+                    if (seg <= 45) {
+
+                        return {
+                            t: 'Chegando',
+                            c: 'eta-agora'
+                        };
+                    }
+
+                    const min =
+                        Math.ceil(seg / 60);
+
+                    return {
+                        t: min + ' min',
+                        c:
+                            min <= 5
+                                ? 'eta-perto'
+                                : ''
+                    };
+                }
+
+                function etaDoPonto(p) {
+
+                    let melhor = null;
+
+                    let menor = Infinity;
+
+                    onibus.forEach(
+                        function (b) {
+
+                            const s =
+                                segundosAtePonto(
+                                    b,
+                                    p.id
+                                );
+
+                            if (s < menor) {
+
+                                menor = s;
+
+                                melhor = b;
+                            }
+                        }
+                    );
+
+                    if (!melhor) {
+                        return null;
+                    }
+
+                    return {
+
+                        bus: melhor,
+
+                        seg: menor,
+
+                        info:
+                            infoETA(
+                                menor,
+                                melhor.espera > 0 &&
+                                melhor.destinoIndex === p.id
+                            )
+                    };
+                }
+
+                function nomeCurto(p) {
+
+                    return p.nome
+                        .replace(
+                            /^Ponto\s+/i,
+                            ''
+                        )
+                        .replace(
+                            new RegExp(
+                                '\\s*-\\s*' +
+                                p.cidade +
+                                '$'
+                            ),
+                            ''
+                        );
+                }
+
+                /* =========================================================
+                   POPUP DO PONTO
+                ========================================================= */
+
+                function criarPopupPonto(p) {
+
+                    const r =
+                        etaDoPonto(p);
+
+                    const du =
+                        posicaoUsuario
+                            ? metros(
+                                posicaoUsuario,
+                                [
+                                    p.latitude,
+                                    p.longitude
+                                ]
+                            )
+                            : null;
+
+                    return `
+                        <div
+                            class="pp"
+                            style="min-width:210px"
+                        >
+
+                            <h5>
+                                ${p.nome}
+                            </h5>
+
+                            <small>
+                                ${p.cidade}
+                                ·
+                                ${p.passageiros}
+                                passageiros aguardando
+                            </small>
+
+                            ${
+                                du !== null
+                                    ? `
+                                        <p>
+                                            <small>
+                                                A
+                                                ${formatarDistancia(du)}
+                                                de você
+                                            </small>
+                                        </p>
+                                    `
+                                    : ''
+                            }
+
+                            <div class="eta-card">
+
+                                <strong>
+                                    Próximo ônibus
+                                </strong>
+
+                                <br>
+
+                                ${
+                                    r
+                                        ? `
+                                            Ônibus
+                                            ${r.bus.numero}
+
+                                            <span
+                                                class="eta ${r.info.c}"
+                                            >
+                                                ${r.info.t}
+                                            </span>
+                                        `
+                                        :
+                                        'Nenhum ônibus previsto.'
+                                }
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+
+                /* =========================================================
+                   POPUP DO ÔNIBUS COM ALERTA
+                ========================================================= */
+
+                function criarPopupOnibus(bus) {
+
+                    const d =
+                        obterDestino(bus);
+
+                    const parado =
+                        bus.espera > 0;
+
+                    const e =
+                        infoETA(
+                            segundosAtePonto(
+                                bus,
+                                bus.destinoIndex
+                            ),
+                            parado
+                        );
+
+                    let alertaHTML = '';
+
+                    if (bus.alerta) {
+
+                        const classe =
+                            bus.alerta.nivel === 'danger'
+                                ? 'danger'
+                                :
+                                bus.alerta.nivel === 'info'
+                                    ? 'info'
+                                    : '';
+
+                        alertaHTML = `
+                            <div
+                                class="alerta-card ${classe}"
+                            >
+
+                                <div class="alerta-card-icone">
+
+                                    <i
+                                        class="bi ${bus.alerta.icone}"
+                                    ></i>
+
+                                </div>
+
+                                <div class="alerta-card-info">
+
+                                    <strong>
+                                        ${bus.alerta.tipo}
+                                    </strong>
+
+                                    <span>
+                                        ${bus.alerta.mensagem}
+                                    </span>
+
+                                </div>
+
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div
+                            class="pp"
+                            style="min-width:235px"
+                        >
+
+                            <h5>
+                                Ônibus ${bus.numero}
+                            </h5>
+
+                            <small>
+                                ${
+                                    parado
+                                        ? 'Parado no ponto'
+                                        : 'Em operação'
+                                }
+                            </small>
+
+                            <p>
+
+                                <small>
+                                    Próximo ponto
+                                </small>
+
+                                <br>
+
+                                <strong>
+                                    ${d.nome}
+                                </strong>
+
+                            </p>
+
+                            <p>
+
+                                <span
+                                    class="eta ${e.c}"
+                                >
+                                    ${e.t}
+                                </span>
+
+                                ${
+                                    parado
+                                        ? ''
+                                        :
+                                        `
+                                            <small>
+                                                a
+                                                ${formatarDistancia(
+                                                    distRestanteDoOnibus(bus)
+                                                )}
+                                                do ponto
+                                            </small>
+                                        `
+                                }
+
+                            </p>
+
+                            ${alertaHTML}
+
+                        </div>
+                    `;
+                }
+
+                /* =========================================================
+                   ATUALIZA POPUPS
+                ========================================================= */
+
+                function atualizarPopups() {
+
+                    marcadoresPontos
+                        .concat(marcadoresOnibus)
+                        .forEach(
+                            function (item) {
+
+                                if (
+                                    !item.marker.isPopupOpen()
+                                ) {
+                                    return;
+                                }
+
+                                const no =
+                                    item.marker
+                                        .getPopup()
+                                        .getElement();
+
+                                const conteudo =
+                                    no &&
+                                    no.querySelector(
+                                        '.leaflet-popup-content'
+                                    );
+
+                                if (!conteudo) {
+                                    return;
+                                }
+
+                                const html =
+                                    item.dados.numero
+                                        ? criarPopupOnibus(
+                                            item.dados
+                                        )
+                                        : criarPopupPonto(
+                                            item.dados
+                                        );
+
+                                if (
+                                    conteudo.dataset.ultimo !==
+                                    html
+                                ) {
+
+                                    conteudo.dataset.ultimo =
+                                        html;
+
+                                    conteudo.innerHTML =
+                                        html;
+                                }
+                            }
+                        );
+                }
+
+                /* =========================================================
+                   ROTAS DOS ÔNIBUS
+                ========================================================= */
+
+                async function calcularRota(bus) {
+
+                    const destino =
+                        obterDestino(bus);
+
+                    const versao =
+                        ++bus.versaoRota;
+
+                    try {
+
+                        const url =
+                            'https://router.project-osrm.org/route/v1/driving/' +
+                            bus.longitude +
+                            ',' +
+                            bus.latitude +
+                            ';' +
+                            destino.longitude +
+                            ',' +
+                            destino.latitude +
+                            '?overview=full&geometries=geojson';
+
+                        const resposta =
+                            await fetch(url);
+
+                        if (!resposta.ok) {
+
+                            throw new Error(
+                                'Erro no serviço de rotas'
+                            );
+                        }
+
+                        const dados =
+                            await resposta.json();
+
+                        if (
+                            !dados.routes ||
+                            !dados.routes.length
+                        ) {
+
+                            throw new Error(
+                                'Nenhuma rota encontrada'
+                            );
+                        }
+
+                        if (
+                            versao !== bus.versaoRota ||
+                            !bus.aCaminho
+                        ) {
+                            return;
+                        }
+
+                        bus.rota =
+                            dados.routes[0]
+                                .geometry
+                                .coordinates
+                                .map(
+                                    c => [
+                                        c[1],
+                                        c[0]
+                                    ]
+                                );
+
+                        bus.indiceRota = 0;
+
+                        bus.distRestante =
+                            dados.routes[0].distance;
+
+                    } catch (erro) {
+
+                        console.error(
+                            'Erro ao calcular rota do ônibus',
+                            bus.numero,
+                            erro
+                        );
+
+                        if (
+                            versao !== bus.versaoRota ||
+                            !bus.aCaminho
+                        ) {
+                            return;
+                        }
+
+                        bus.rota = [
+                            [
+                                destino.latitude,
+                                destino.longitude
+                            ]
+                        ];
+
+                        bus.indiceRota = 0;
+
+                        bus.distRestante =
+                            metros(
+                                [
+                                    bus.latitude,
+                                    bus.longitude
+                                ],
+                                [
+                                    destino.latitude,
+                                    destino.longitude
+                                ]
+                            );
+
+                        setTimeout(
+                            function () {
+
+                                if (
+                                    versao ===
+                                    bus.versaoRota &&
+                                    bus.aCaminho
+                                ) {
+
+                                    calcularRota(bus);
+                                }
+                            },
+                            8000
+                        );
+                    }
+                }
+
+                function iniciarViagem(bus) {
+
+                    bus.destinoIndex =
+                        (
+                            bus.destinoIndex + 1
+                        ) %
+                        pontosPassageiros.length;
+
+                    bus.distRestante = null;
+
+                    bus.rota = [];
+
+                    bus.indiceRota = 0;
+
+                    bus.aCaminho = true;
+
+                    calcularRota(bus);
+                }
+
+                function moverOnibus(
+                    bus,
+                    dt
+                ) {
+
+                    if (bus.espera > 0) {
+
+                        bus.espera -= dt;
+
+                        if (bus.espera <= 0) {
+
+                            bus.espera = 0;
+
+                            iniciarViagem(bus);
+                        }
+
+                        return;
+                    }
+
+                    if (!bus.rota.length) {
+                        return;
+                    }
+
+                    let passo =
+                        VELOCIDADE_ONIBUS * dt;
+
+                    while (
+                        passo > 0 &&
+                        bus.indiceRota <
+                        bus.rota.length
+                    ) {
+
+                        const alvo =
+                            bus.rota[
+                                bus.indiceRota
+                            ];
+
+                        const d =
+                            metros(
+                                [
+                                    bus.latitude,
+                                    bus.longitude
+                                ],
+                                alvo
+                            );
+
+                        if (d <= passo) {
+
+                            bus.latitude =
+                                alvo[0];
+
+                            bus.longitude =
+                                alvo[1];
+
+                            bus.indiceRota++;
+
+                            passo -= d;
+
+                            bus.distRestante =
+                                Math.max(
+                                    0,
+                                    bus.distRestante - d
+                                );
+
+                        } else {
+
+                            const f =
+                                passo / d;
+
+                            bus.latitude +=
+                                (
+                                    alvo[0] -
+                                    bus.latitude
+                                ) * f;
+
+                            bus.longitude +=
+                                (
+                                    alvo[1] -
+                                    bus.longitude
+                                ) * f;
+
+                            bus.distRestante =
+                                Math.max(
+                                    0,
+                                    bus.distRestante - passo
+                                );
+
+                            passo = 0;
+                        }
+                    }
+
+                    if (
+                        bus.indiceRota >=
+                        bus.rota.length
+                    ) {
+
+                        const destino =
+                            obterDestino(bus);
+
+                        bus.latitude =
+                            destino.latitude;
+
+                        bus.longitude =
+                            destino.longitude;
+
+                        bus.rota = [];
+
+                        bus.distRestante = 0;
+
+                        bus.aCaminho = false;
+
+                        bus.espera =
+                            TEMPO_PARADA;
+                    }
+
+                    bus.marker.setLatLng(
+                        [
+                            bus.latitude,
+                            bus.longitude
+                        ]
+                    );
+                }
+
+                /* =========================================================
+                   RENDERIZAÇÃO
+                ========================================================= */
+
+                function definirHTML(
+                    id,
+                    html
+                ) {
+
+                    if (
+                        cacheHTML[id] !== html
+                    ) {
+
+                        cacheHTML[id] = html;
+
+                        document.getElementById(
+                            id
+                        ).innerHTML = html;
+                    }
+                }
+
+                function renderizarListas() {
+
+                    const q =
+                        norm(termoBusca);
+
+                    const cidades =
+                        ['Todas'].concat(
+                            Array.from(
+                                new Set(
+                                    pontosPassageiros.map(
+                                        p => p.cidade
+                                    )
+                                )
+                            )
+                        );
+
+                    definirHTML(
+                        'chips-cidades',
+
+                        cidades.map(
+                            c => `
+                                <button
+                                    type="button"
+                                    class="${c === cidadeAtual ? 'ativa' : ''}"
+                                    data-cidade="${c}"
+                                >
+                                    ${c}
+                                </button>
+                            `
+                        ).join('')
+                    );
+
+                    /* =========================
+                       PONTOS
+                    ========================= */
+
+                    const pts =
+                        pontosPassageiros
+
+                            .map(
+                                p => ({
+
+                                    p: p,
+
+                                    r:
+                                        etaDoPonto(p),
+
+                                    du:
+                                        posicaoUsuario
+                                            ? metros(
+                                                posicaoUsuario,
+                                                [
+                                                    p.latitude,
+                                                    p.longitude
+                                                ]
+                                            )
+                                            : null
+
+                                })
+                            )
+
+                            .filter(
+                                x =>
+
+                                    (
+                                        cidadeAtual ===
+                                        'Todas' ||
+                                        x.p.cidade ===
+                                        cidadeAtual
+                                    )
+
+                                    &&
+
+                                    norm(
+                                        x.p.nome +
+                                        ' ' +
+                                        x.p.cidade
+                                    ).includes(q)
+                            )
+
+                            .sort(
+                                (a, b) =>
+
+                                    posicaoUsuario
+
+                                        ? a.du - b.du
+
+                                        :
+
+                                        (
+                                            a.r
+                                                ? a.r.seg
+                                                : 1e9
+                                        )
+
+                                        -
+
+                                        (
+                                            b.r
+                                                ? b.r.seg
+                                                : 1e9
+                                        )
+                            );
+
+                    definirHTML(
+                        'lista-pontos',
+
+                        pts.length
+
+                            ?
+
+                            pts.map(
+                                x => `
+
+                                    <div
+                                        class="item"
+                                        data-ponto="${x.p.id}"
+                                    >
+
+                                        <div class="item-ico">
+                                            ${x.p.passageiros}
+                                        </div>
+
+                                        <div class="item-info">
+
+                                            <strong>
+                                                ${nomeCurto(x.p)}
+                                            </strong>
+
+                                            <span>
+                                                ${
+                                                    x.du !== null
+                                                        ? formatarDistancia(x.du) +
+                                                          ' de você · '
+                                                        : ''
+                                                }
+
+                                                ${x.p.passageiros}
+                                                aguardando
+                                            </span>
+
+                                            <span>
+                                                ${
+                                                    x.r
+                                                        ? 'Ônibus ' +
+                                                          x.r.bus.numero
+                                                        : 'Nenhum ônibus previsto'
+                                                }
+                                            </span>
+
+                                        </div>
+
+                                        <div
+                                            class="eta ${
+                                                x.r
+                                                    ? x.r.info.c
+                                                    : ''
+                                            }"
+                                        >
+                                            ${
+                                                x.r
+                                                    ? x.r.info.t
+                                                    : '--'
+                                            }
+                                        </div>
+
+                                    </div>
+
+                                `
+                            ).join('')
+
+                            :
+
+                            `
+                                <div class="vazio">
+                                    Nenhum ponto encontrado.
+                                </div>
+                            `
+                    );
+
+                    /* =========================
+                       ÔNIBUS
+                    ========================= */
+
+                    const bs =
+                        onibus
+
+                            .map(
+                                b => ({
+
+                                    b: b,
+
+                                    d:
+                                        obterDestino(b),
+
+                                    seg:
+                                        segundosAtePonto(
+                                            b,
+                                            b.destinoIndex
+                                        )
+                                })
+                            )
+
+                            .filter(
+                                x =>
+
+                                    (
+                                        cidadeAtual ===
+                                        'Todas' ||
+
+                                        x.d.cidade ===
+                                        cidadeAtual
+                                    )
+
+                                    &&
+
+                                    norm(
+                                        'onibus ' +
+                                        x.b.numero +
+                                        ' ' +
+                                        x.d.nome
+                                    ).includes(q)
+                            )
+
+                            .sort(
+                                (a, b) =>
+                                    a.seg - b.seg
+                            );
+
+                    definirHTML(
+                        'lista-onibus',
+
+                        bs.length
+
+                            ?
+
+                            bs.map(
+                                x => {
+
+                                    const parado =
+                                        x.b.espera > 0;
+
+                                    const e =
+                                        infoETA(
+                                            x.seg,
+                                            parado
+                                        );
+
+                                    let alertaHTML =
+                                        '';
+
+                                    if (
+                                        x.b.alerta
+                                    ) {
+
+                                        let classe =
+                                            '';
+
+                                        if (
+                                            x.b.alerta.nivel ===
+                                            'danger'
+                                        ) {
+                                            classe =
+                                                'alto';
+                                        }
+
+                                        if (
+                                            x.b.alerta.nivel ===
+                                            'info'
+                                        ) {
+                                            classe =
+                                                'info';
+                                        }
+
+                                        alertaHTML = `
+                                            <span
+                                                class="bus-alerta ${classe}"
+                                            >
+                                                <i
+                                                    class="bi ${x.b.alerta.icone}"
+                                                ></i>
+
+                                                ${x.b.alerta.tipo}
+                                            </span>
+                                        `;
+                                    }
+
+                                    return `
+
+                                        <div
+                                            class="item"
+                                            data-onibus="${x.b.numero}"
+                                        >
+
+                                            <div class="item-ico bus">
+                                                ${x.b.numero}
+                                            </div>
+
+                                            <div class="item-info">
+
+                                                <strong>
+                                                    Indo para
+                                                    ${nomeCurto(x.d)}
+                                                </strong>
+
+                                                <span>
+                                                    ${
+                                                        parado
+                                                            ? 'Parado no ponto'
+                                                            :
+                                                            'a ' +
+                                                            formatarDistancia(
+                                                                distRestanteDoOnibus(
+                                                                    x.b
+                                                                )
+                                                            ) +
+                                                            ' do ponto'
+                                                    }
+                                                </span>
+
+                                                ${alertaHTML}
+
+                                            </div>
+
+                                            <div
+                                                class="eta ${e.c}"
+                                            >
+                                                ${e.t}
+                                            </div>
+
+                                        </div>
+
+                                    `;
+                                }
+                            ).join('')
+
+                            :
+
+                            `
+                                <div class="vazio">
+                                    Nenhum ônibus encontrado.
+                                </div>
+                            `
+                    );
+
+                    /* =========================
+                       ROTAS
+                    ========================= */
+
+                    const rs =
+                        rotas
+
+                            .map(
+                                function (r, i) {
+
+                                    return {
+                                        r: r,
+                                        i: i
+                                    };
+                                }
+                            )
+
+                            .filter(
+                                x =>
+                                    norm(
+                                        x.r.descricao
+                                    ).includes(q)
+                            );
+
+                    definirHTML(
+                        'lista-rotas',
+
+                        rs.length
+
+                            ?
+
+                            rs.map(
+                                x => `
+
+                                    <div
+                                        class="item ${
+                                            x.i === rotaAtiva
+                                                ? 'ativo'
+                                                : ''
+                                        }"
+                                        data-rota="${x.i}"
+                                    >
+
+                                        <div class="item-ico rota">
+
+                                            <i
+                                                class="bi bi-signpost-split"
+                                            ></i>
+
+                                        </div>
+
+                                        <div class="item-info">
+
+                                            <strong>
+                                                ${x.r.descricao}
+                                            </strong>
+
+                                            <span>
+                                                Tempo médio:
+                                                ${x.r.tempo_medio}
+                                                minutos
+                                            </span>
+
+                                        </div>
+
+                                        <div class="item-go">
+
+                                            <i
+                                                class="bi ${
+                                                    x.i === rotaAtiva
+                                                        ? 'bi-eye-fill'
+                                                        : 'bi-chevron-right'
+                                                }"
+                                            ></i>
+
+                                        </div>
+
+                                    </div>
+
+                                `
+                            ).join('')
+
+                            :
+
+                            `
+                                <div class="vazio">
+                                    Nenhuma rota cadastrada.
+                                </div>
+                            `
+                    );
+                }
+
+                /* =========================================================
+                   MOTORISTA
+                ========================================================= */
+
+                let linhaMotorista = null;
+
+                function atualizarMotorista() {
+
+                    if (
+                        tipoUsuario !==
+                        'MOTORISTA'
+                    ) {
+                        return;
+                    }
+
+                    const bus =
+                        onibus[0];
+
+                    const parado =
+                        bus.espera > 0;
+
+                    const d =
+                        obterDestino(bus);
+
+                    const e =
+                        infoETA(
+                            segundosAtePonto(
+                                bus,
+                                bus.destinoIndex
+                            ),
+                            parado
+                        );
+
+                    const set =
+                        function (
+                            id,
+                            txt
+                        ) {
+
+                            const el =
+                                document.getElementById(
+                                    id
+                                );
+
+                            if (el) {
+                                el.textContent =
+                                    txt;
+                            }
+                        };
+
+                    set(
+                        'numero-motorista',
+                        'Ônibus ' +
+                        bus.numero
+                    );
+
+                    set(
+                        'status-motorista',
+                        parado
+                            ? 'Parado no ponto'
+                            : 'Em operação'
+                    );
+
+                    set(
+                        'proximo-ponto-motorista',
+                        nomeCurto(d) +
+                        ' · ' +
+                        d.cidade
+                    );
+
+                    set(
+                        'eta-motorista',
+                        e.t
+                    );
+
+                    set(
+                        'dist-motorista',
+
+                        parado
+                            ? 'embarque em andamento'
+                            :
+                            'faltam ' +
+                            formatarDistancia(
+                                distRestanteDoOnibus(
+                                    bus
+                                )
+                            )
+                    );
+
+                    set(
+                        'aguardando-motorista',
+                        d.passageiros
+                    );
+
+                    if (!linhaMotorista) {
+
+                        linhaMotorista =
+                            L.polyline(
+                                [],
+                                {
+                                    color: '#f59e0b',
+                                    weight: 6,
+                                    opacity: .9
+                                }
+                            ).addTo(map);
+                    }
+
+                    linhaMotorista.setLatLngs(
+
+                        bus.rota.length
+
+                            ?
+
+                            [
+                                [
+                                    bus.latitude,
+                                    bus.longitude
+                                ]
+                            ].concat(
+                                bus.rota.slice(
+                                    bus.indiceRota
+                                )
+                            )
+
+                            :
+
+                            []
+                    );
+                }
+
+                /* =========================================================
+                   CONTADORES
+                ========================================================= */
+
+                if (
+                    tipoUsuario ===
+                    'ADMIN'
+                ) {
+
+                    const co =
+                        document.getElementById(
+                            'contador-onibus'
+                        );
+
+                    const cp =
+                        document.getElementById(
+                            'contador-pontos'
+                        );
+
+                    if (co) {
+                        co.textContent =
+                            onibus.length;
+                    }
+
+                    if (cp) {
+                        cp.textContent =
+                            pontosPassageiros.length;
+                    }
+                }
+
+                function atualizarInterface() {
+
+                    renderizarListas();
+
+                    atualizarPopups();
+
+                    atualizarMotorista();
+                }
+
+                /* =========================================================
+                   ROTAS NO MAPA
+                ========================================================= */
+
+                let camadaRota = null;
+
+                let tokenRota = 0;
+
+                function pontosDaRota(r) {
+
+                    const desc =
+                        norm(r.descricao);
+
+                    const cidades =
+                        Array.from(
+                            new Set(
+                                pontosPassageiros.map(
+                                    p => p.cidade
+                                )
+                            )
+                        )
+
+                        .map(
+                            c => ({
+                                c: c,
+                                i: desc.indexOf(
+                                    norm(c)
+                                )
+                            })
+                        )
+
+                        .filter(
+                            x => x.i >= 0
+                        )
+
+                        .sort(
+                            (a, b) =>
+                                a.i - b.i
+                        )
+
+                        .map(
+                            x => x.c
+                        );
+
+                    let lista = [];
+
+                    cidades.forEach(
+                        function (c) {
+
+                            lista =
+                                lista.concat(
+                                    pontosPassageiros.filter(
+                                        p =>
+                                            p.cidade === c
+                                    )
+                                );
+                        }
+                    );
+
+                    return lista;
+                }
+
+                function ajustarNaRota(coords) {
+
+                    if (!ehDesktop()) {
+                        definirSheet('min');
+                    }
+
+                    map.fitBounds(
+                        L.latLngBounds(coords),
+                        {
+                            paddingTopLeft:
+                                [
+                                    ehDesktop()
+                                        ? 400
+                                        : 30,
+                                    90
+                                ],
+
+                            paddingBottomRight:
+                                [
+                                    30,
+                                    (
+                                        ehDesktop()
+                                            ? 0
+                                            : 150
+                                    ) + 30
+                                ]
+                        }
+                    );
+                }
+
+                function limparRota() {
+
+                    tokenRota++;
+
+                    rotaAtiva = null;
+
+                    if (camadaRota) {
+
+                        map.removeLayer(
+                            camadaRota
+                        );
+
+                        camadaRota = null;
+                    }
+
+                    areaMapa.classList.remove(
+                        'com-rota'
+                    );
+
+                    document.getElementById(
+                        'rota-banner'
+                    ).style.display =
+                        'none';
+
+                    renderizarListas();
+                }
+
+                async function mostrarRota(i) {
+
+                    if (
+                        rotaAtiva === i
+                    ) {
+
+                        limparRota();
+
+                        return;
+                    }
+
+                    const r =
+                        rotas[i];
+
+                    if (!r) {
+                        return;
+                    }
+
+                    const pts =
+                        pontosDaRota(r);
+
+                    if (
+                        pts.length < 2
+                    ) {
+
+                        mostrarAviso(
+                            'Não achei pontos para a rota "' +
+                            r.descricao +
+                            '". Cite as cidades da rota na descrição.',
+                            false
+                        );
+
+                        setTimeout(
+                            esconderAviso,
+                            5000
+                        );
+
+                        return;
+                    }
+
+                    limparRota();
+
+                    rotaAtiva = i;
+
+                    const token =
+                        tokenRota;
+
+                    camadaRota =
+                        L.layerGroup()
+                            .addTo(map);
+
+                    areaMapa.classList.add(
+                        'com-rota'
+                    );
+
+                    document.getElementById(
+                        'rb-titulo'
+                    ).textContent =
+                        r.descricao;
+
+                    document.getElementById(
+                        'rb-sub'
+                    ).textContent =
+                        pts.length +
+                        ' pontos · tempo médio ' +
+                        r.tempo_medio +
+                        ' min';
+
+                    document.getElementById(
+                        'rota-banner'
+                    ).style.display =
+                        'flex';
+
+                    pts.forEach(
+                        function (p, n) {
+
+                            L.marker(
+                                [
+                                    p.latitude,
+                                    p.longitude
+                                ],
+                                {
+                                    icon:
+                                        L.divIcon({
+                                            className: '',
+
+                                            html:
+                                                `
+                                                    <div class="parada-pin">
+                                                        ${n + 1}
+                                                    </div>
+                                                `,
+
+                                            iconSize:
+                                                [
+                                                    26,
+                                                    26
+                                                ],
+
+                                            iconAnchor:
+                                                [
+                                                    13,
+                                                    13
+                                                ]
+                                        }),
+
+                                    zIndexOffset:
+                                        500,
+
+                                    interactive:
+                                        false
+                                }
+                            ).addTo(
+                                camadaRota
+                            );
+                        }
+                    );
+
+                    let linha =
+                        pts.map(
+                            p => [
+                                p.latitude,
+                                p.longitude
+                            ]
+                        );
+
+                    ajustarNaRota(
+                        linha
+                    );
+
+                    renderizarListas();
+
+                    try {
+
+                        const url =
+                            'https://router.project-osrm.org/route/v1/driving/' +
+                            pts.map(
+                                p =>
+                                    p.longitude +
+                                    ',' +
+                                    p.latitude
+                            ).join(';') +
+                            '?overview=full&geometries=geojson';
+
+                        const resposta =
+                            await fetch(url);
+
+                        const dados =
+                            await resposta.json();
+
+                        if (
+                            dados.routes &&
+                            dados.routes.length
+                        ) {
+
+                            linha =
+                                dados.routes[0]
+                                    .geometry
+                                    .coordinates
+                                    .map(
+                                        c => [
+                                            c[1],
+                                            c[0]
+                                        ]
+                                    );
+                        }
+
+                    } catch (erro) {
+
+                        console.error(
+                            'Erro ao traçar a rota',
+                            erro
+                        );
+                    }
+
+                    if (
+                        token !==
+                        tokenRota
+                    ) {
+                        return;
+                    }
+
+                    L.polyline(
+                        linha,
+                        {
+                            color: '#ffffff',
+                            weight: 10,
+                            opacity: .9
+                        }
+                    ).addTo(
+                        camadaRota
+                    );
+
+                    L.polyline(
+                        linha,
+                        {
+                            color: '#7a1f1f',
+                            weight: 6,
+                            opacity: .95
+                        }
+                    ).addTo(
+                        camadaRota
+                    );
+
+                    ajustarNaRota(
+                        linha
+                    );
+                }
+
+                /* =========================================================
+                   ABAS
+                ========================================================= */
+
+                function trocarAba(aba) {
+
+                    abaAtual = aba;
+
+                    document
+                        .querySelectorAll(
+                            '.abas button'
+                        )
+                        .forEach(
+                            function (b) {
+
+                                b.classList.toggle(
+                                    'ativa',
+                                    b.dataset.aba === aba
+                                );
+                            }
+                        );
+
+                    [
+                        'pontos',
+                        'onibus',
+                        'rotas'
+                    ].forEach(
+                        function (a) {
+
+                            document.getElementById(
+                                'lista-' + a
+                            ).style.display =
+                                a === aba
+                                    ? 'block'
+                                    : 'none';
+                        }
+                    );
+
+                    document.getElementById(
+                        'chips-cidades'
+                    ).style.display =
+                        aba === 'rotas'
+                            ? 'none'
+                            : 'flex';
+                }
+
+                /* =========================================================
+                   PAINEL DESLIZANTE
+                ========================================================= */
+
+                function altSheet(e) {
+
+                    const h =
+                        areaMapa.clientHeight;
+
+                    return e === 'min'
+                        ? 150
+                        : e === 'mid'
+                            ? Math.round(
+                                h * .45
+                            )
+                            : Math.round(
+                                h * .88
+                            );
+                }
+
+                function aplicarSheet(
+                    px,
+                    animar
+                ) {
+
+                    sheet.style.transition =
+                        animar
+                            ? 'height .25s ease'
+                            : 'none';
+
+                    sheet.style.height =
+                        px + 'px';
+
+                    areaMapa.style.setProperty(
+                        '--sh',
+                        px + 'px'
+                    );
+                }
+
+                function definirSheet(e) {
+
+                    estadoSheet = e;
+
+                    if (ehDesktop()) {
+
+                        sheet.style.height =
+                            '';
+
+                        areaMapa.style.removeProperty(
+                            '--sh'
+                        );
+
+                        return;
+                    }
+
+                    aplicarSheet(
+                        altSheet(e),
+                        true
+                    );
+                }
+
+                function ajustarAltura() {
+
+                    const topo =
+                        areaMapa.getBoundingClientRect()
+                            .top +
+                        window.scrollY;
+
+                    areaMapa.style.height =
+                        Math.max(
+                            420,
+                            window.innerHeight -
+                            topo
+                        ) + 'px';
+
+                    map.invalidateSize();
+
+                    definirSheet(
+                        estadoSheet
+                    );
+                }
+
+                /* =========================================================
+                   MAPA
+                ========================================================= */
+
+                function verTudo() {
+
+                    if (
+                        !marcadoresPontos.length
+                    ) {
+                        return;
+                    }
+
+                    const grupo =
+                        L.featureGroup(
+                            marcadoresPontos.map(
+                                i => i.marker
+                            )
+                        );
+
+                    map.fitBounds(
+                        grupo.getBounds(),
+                        {
+                            paddingTopLeft:
+                                [
+                                    ehDesktop()
+                                        ? 400
+                                        : 30,
+                                    30
+                                ],
+
+                            paddingBottomRight:
+                                [
+                                    30,
+                                    (
+                                        ehDesktop()
+                                            ? 0
+                                            : sheet.offsetHeight
+                                    ) + 30
+                                ]
+                        }
+                    );
+                }
+
+                function centralizarUsuario() {
+
+                    if (marcadorUsuario) {
+
+                        map.flyTo(
+                            marcadorUsuario.getLatLng(),
+                            16
+                        );
+                    }
+                }
+
+                function irPara(marker) {
+
+                    if (!ehDesktop()) {
+
+                        definirSheet(
+                            'min'
+                        );
+                    }
+
+                    map.flyTo(
+                        marker.getLatLng(),
+                        16,
+                        {
+                            duration: .8
+                        }
+                    );
+
+                    marker.openPopup();
+                }
+
+                /* =========================================================
+                   EVENTOS DO PAINEL
+                ========================================================= */
+
+                sheet.addEventListener(
+                    'click',
+                    function (e) {
+
+                        const cid =
+                            e.target.closest(
+                                '[data-cidade]'
+                            );
+
+                        if (cid) {
+
+                            cidadeAtual =
+                                cid.dataset.cidade;
+
+                            renderizarListas();
+
+                            return;
+                        }
+
+                        const aba =
+                            e.target.closest(
+                                '[data-aba]'
+                            );
+
+                        if (aba) {
+
+                            trocarAba(
+                                aba.dataset.aba
+                            );
+
+                            return;
+                        }
+
+                        const rt =
+                            e.target.closest(
+                                '[data-rota]'
+                            );
+
+                        if (rt) {
+
+                            mostrarRota(
+                                Number(
+                                    rt.dataset.rota
+                                )
+                            );
+
+                            return;
+                        }
+
+                        const pt =
+                            e.target.closest(
+                                '[data-ponto]'
+                            );
+
+                        if (pt) {
+
+                            irPara(
+                                marcadoresPontos[
+                                    pt.dataset.ponto
+                                ].marker
+                            );
+
+                            return;
+                        }
+
+                        const bs =
+                            e.target.closest(
+                                '[data-onibus]'
+                            );
+
+                        if (bs) {
+
+                            const m =
+                                marcadoresOnibus.find(
+                                    x =>
+                                        String(
+                                            x.dados.numero
+                                        ) ===
+                                        bs.dataset.onibus
+                                );
+
+                            if (m) {
+
+                                irPara(
+                                    m.marker
+                                );
+                            }
+                        }
+                    }
+                );
+
+                /* =========================================================
+                   BUSCA
+                ========================================================= */
+
+                const campoBusca =
+                    document.getElementById(
+                        'busca'
+                    );
+
+                campoBusca.addEventListener(
+                    'input',
+                    function () {
+
+                        termoBusca =
+                            campoBusca.value;
+
+                        renderizarListas();
+                    }
+                );
+
+                campoBusca.addEventListener(
+                    'focus',
+                    function () {
+
+                        if (!ehDesktop()) {
+
+                            definirSheet(
+                                'max'
+                            );
+                        }
+                    }
+                );
+
+                /* =========================================================
+                   ROLAGEM DOS CHIPS
+                   MOUSE + ARRASTAR + TOUCH
+                ========================================================= */
+
+                const chips =
+                    document.getElementById(
+                        'chips-cidades'
+                    );
+
+                let chipsArrastando = false;
+
+                let chipsInicioX = 0;
+
+                let chipsScrollInicial = 0;
+
+                let chipsMoveu = false;
+
+                chips.addEventListener(
+                    'pointerdown',
+                    function (e) {
+
+                        chipsArrastando = true;
+
+                        chipsMoveu = false;
+
+                        chipsInicioX =
+                            e.clientX;
+
+                        chipsScrollInicial =
+                            chips.scrollLeft;
+
+                        chips.classList.add(
+                            'arrastando'
+                        );
+
+                        try {
+                            chips.setPointerCapture(
+                                e.pointerId
+                            );
+                        } catch (erro) {}
+                    }
+                );
+
+                chips.addEventListener(
+                    'pointermove',
+                    function (e) {
+
+                        if (
+                            !chipsArrastando
+                        ) {
+                            return;
+                        }
+
+                        const deslocamento =
+                            e.clientX -
+                            chipsInicioX;
+
+                        if (
+                            Math.abs(
+                                deslocamento
+                            ) > 5
+                        ) {
+                            chipsMoveu = true;
+                        }
+
+                        chips.scrollLeft =
+                            chipsScrollInicial -
+                            deslocamento;
+                    }
+                );
+
+                function finalizarArrastoChips() {
+
+                    chipsArrastando = false;
+
+                    chips.classList.remove(
+                        'arrastando'
+                    );
+                }
+
+                chips.addEventListener(
+                    'pointerup',
+                    finalizarArrastoChips
+                );
+
+                chips.addEventListener(
+                    'pointercancel',
+                    finalizarArrastoChips
+                );
+
+                chips.addEventListener(
+                    'pointerleave',
+                    function () {
+
+                        if (
+                            chipsArrastando
+                        ) {
+                            finalizarArrastoChips();
+                        }
+                    }
+                );
+
+                /*
+                 * Roda do mouse:
+                 * quando o usuário gira para cima/baixo,
+                 * transformamos em rolagem horizontal.
+                 */
+
+                chips.addEventListener(
+                    'wheel',
+                    function (e) {
+
+                        if (
+                            Math.abs(e.deltaY) >
+                            Math.abs(e.deltaX)
+                        ) {
+
+                            chips.scrollLeft +=
+                                e.deltaY;
+
+                            e.preventDefault();
+                        }
+                    },
+                    {
+                        passive: false
+                    }
+                );
+
+                /*
+                 * Evita selecionar cidade quando
+                 * o usuário estava apenas arrastando.
+                 */
+
+                chips.addEventListener(
+                    'click',
+                    function (e) {
+
+                        if (chipsMoveu) {
+
+                            e.preventDefault();
+
+                            e.stopPropagation();
+
+                            chipsMoveu = false;
+                        }
+                    },
+                    true
+                );
+
+                /* =========================================================
+                   ARRASTAR PAINEL NO CELULAR
+                ========================================================= */
+
+                const topoSheet =
+                    document.getElementById(
+                        'sheet-topo'
+                    );
+
+                let arrasto = null;
+
+                topoSheet.addEventListener(
+                    'pointerdown',
+                    function (e) {
+
+                        if (ehDesktop()) {
+                            return;
+                        }
+
+                        arrasto = {
+
+                            y: e.clientY,
+
+                            h: sheet.offsetHeight,
+
+                            moveu: false
+                        };
+
+                        topoSheet.setPointerCapture(
+                            e.pointerId
+                        );
+                    }
+                );
+
+                topoSheet.addEventListener(
+                    'pointermove',
+                    function (e) {
+
+                        if (!arrasto) {
+                            return;
+                        }
+
+                        const d =
+                            arrasto.y -
+                            e.clientY;
+
+                        if (
+                            Math.abs(d) > 5
+                        ) {
+                            arrasto.moveu = true;
+                        }
+
+                        if (
+                            arrasto.moveu
+                        ) {
+
+                            aplicarSheet(
+
+                                Math.min(
+                                    altSheet('max'),
+                                    Math.max(
+                                        110,
+                                        arrasto.h + d
+                                    )
+                                ),
+
+                                false
+                            );
+                        }
+                    }
+                );
+
+                function soltarSheet() {
+
+                    if (!arrasto) {
+                        return;
+                    }
+
+                    const a =
+                        arrasto;
+
+                    arrasto = null;
+
+                    if (!a.moveu) {
+
+                        definirSheet(
+                            estadoSheet === 'mid'
+                                ? 'max'
+                                : 'mid'
+                        );
+
+                        return;
+                    }
+
+                    const h =
+                        sheet.offsetHeight;
+
+                    const melhor =
+                        [
+                            'min',
+                            'mid',
+                            'max'
+                        ].reduce(
+                            function (m, e) {
+
+                                return Math.abs(
+                                    altSheet(e) -
+                                    h
+                                ) < Math.abs(
+                                    altSheet(m) -
+                                    h
+                                )
+                                    ? e
+                                    : m;
+                            }
+                        );
+
+                    definirSheet(
+                        melhor
+                    );
+                }
+
+                topoSheet.addEventListener(
+                    'pointerup',
+                    soltarSheet
+                );
+
+                topoSheet.addEventListener(
+                    'pointercancel',
+                    soltarSheet
+                );
+
+                /* =========================================================
+                   INÍCIO
+                ========================================================= */
+
+                renderizarListas();
+
+                atualizarMotorista();
+
+                obterLocalizacao();
+
+                onibus.forEach(
+                    function (bus, i) {
+
+                        setTimeout(
+                            function () {
+                                calcularRota(bus);
+                            },
+                            i * 300
+                        );
+                    }
+                );
+
+                let ultimoTick =
+                    performance.now();
+
+                setInterval(
+                    function () {
+
+                        const agora =
+                            performance.now();
+
+                        const dt =
+                            Math.min(
+                                (
+                                    agora -
+                                    ultimoTick
+                                ) / 1000,
+                                2
+                            );
+
+                        ultimoTick =
+                            agora;
+
+                        onibus.forEach(
+                            function (bus) {
+
+                                moverOnibus(
+                                    bus,
+                                    dt
+                                );
+                            }
+                        );
+
+                    },
+                    500
+                );
+
+                /*
+                 * Atualiza alertas simulados
+                 * a cada 12 segundos.
+                 */
+
+                setInterval(
+                    function () {
+
+                        atualizarAlertasSimulados();
+
+                        renderizarListas();
+
+                        atualizarPopups();
+
+                    },
+                    12000
+                );
+
+                setInterval(
+                    atualizarInterface,
+                    1000
+                );
+
+                ajustarAltura();
+
+                setTimeout(
+                    function () {
+
+                        ajustarAltura();
+
+                        if (
+                            !centralizouUsuario
+                        ) {
+
+                            verTudo();
+                        }
+
+                    },
+                    700
+                );
+
+                window.addEventListener(
+                    'resize',
+                    ajustarAltura
+                );
+
+            </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<%- include('../../partials/head') %>
+
+    <body class="bg-light">
+
+        <%- include('../../partials/header') %>
+
+            <div class="d-flex">
+
+                <%- include('../../partials/sidebar') %>
+
+                    <main class="content w-100">
+
+                        <div class="container-fluid px-4 py-4">
+
+                            <!-- CABEÇALHO -->
+                            <div class="motorista-header mb-4">
+
+                                <div>
+
+                                    <h1>
+                                        Lista de Motoristas
+                                    </h1>
+
+                                    <p>
+                                        Veja os motoristas registrados no sistema.
+                                    </p>
+
+                                </div>
+
+                                <div class="header-actions">
+
+                                    <a href="/motorista/cadastrar" class="btn btn-novo">
+
+                                        <i class="bi bi-person-plus"></i>
+
+                                        Novo motorista
+
+                                    </a>
+
+                                    <a href="/dashboard" class="btn btn-voltar">
+
+                                        <i class="bi bi-arrow-left"></i>
+
+                                        Voltar
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- MENSAGEM -->
+                            <% if (typeof mensagem !=='undefined' && mensagem) { %>
+
+                                <div class="alert
+                        <%= mensagem.tipo === 'success'
+                            ? 'alert-success'
+                            : 'alert-danger' %>
+                        motorista-alert">
+
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <i class="bi
+                                <%= mensagem.tipo === 'success'
+                                    ? 'bi-check-circle-fill'
+                                    : 'bi-exclamation-circle-fill' %>">
+                                        </i>
+
+                                        <div>
+
+                                            <strong>
+                                                <%= mensagem.tituloMensagem || 'Mensagem' %>
+                                            </strong>
+
+                                            <div>
+                                                <%= mensagem.valor %>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <% } %>
+
+
+                                    <!-- LISTA -->
+                                    <% if (motoristas && motoristas.length> 0) { %>
+
+                                        <div class="motoristas-grid">
+
+                                            <% motoristas.forEach((motorista, index)=> { %>
+
+                                                <div class="motorista-card">
+
+                                                    <!-- PARTE SUPERIOR -->
+                                                    <div class="motorista-top">
+
+                                                        <div class="motorista-identidade">
+
+                                                            <!-- FOTO DO USUÁRIO -->
+                                                            <div class="motorista-avatar">
+
+                                                                <% if ( motorista.usuario && motorista.usuario.id ) { %>
+
+                                                                    <img src="/foto/<%= motorista.usuario.id %>"
+                                                                        alt="Foto de <%= motorista.usuario.nome %>"
+                                                                        class="motorista-foto"
+                                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                                                                    <i
+                                                                        class="bi bi-person-fill motorista-foto-fallback">
+                                                                    </i>
+
+                                                                    <% } else { %>
+
+                                                                        <i
+                                                                            class="bi bi-person-fill motorista-foto-fallback"></i>
+
+                                                                        <% } %>
+
+                                                            </div>
+
+
+                                                            <!-- NOME -->
+                                                            <div class="motorista-nome">
+
+                                                                <h3>
+                                                                    <%= motorista.usuario.nome %>
+                                                                </h3>
+
+                                                                <span>
+                                                                    Motorista #<%= motorista.id %>
+                                                                </span>
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <!-- STATUS -->
+                                                        <% if (motorista.ativo) { %>
+
+                                                            <span class="status ativo">
+
+                                                                <span></span>
+
+                                                                Ativo
+
+                                                            </span>
+
+                                                            <% } else { %>
+
+                                                                <span class="status inativo">
+
+                                                                    <span></span>
+
+                                                                    Inativo
+
+                                                                </span>
+
+                                                                <% } %>
+
+                                                    </div>
+
+
+                                                    <!-- INFORMAÇÕES -->
+                                                    <div class="motorista-info">
+
+                                                        <div class="info-item">
+
+                                                            <div class="info-icon">
+
+                                                                <i class="bi bi-envelope"></i>
+
+                                                            </div>
+
+                                                            <div>
+
+                                                                <small>
+                                                                    Email
+                                                                </small>
+
+                                                                <p>
+                                                                    <%= motorista.usuario.email %>
+                                                                </p>
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div class="info-item">
+
+                                                            <div class="info-icon">
+
+                                                                <i class="bi bi-telephone"></i>
+
+                                                            </div>
+
+                                                            <div>
+
+                                                                <small>
+                                                                    Telefone
+                                                                </small>
+
+                                                                <p>
+                                                                    <%= motorista.telefone || 'Não informado' %>
+                                                                </p>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <!-- AÇÕES -->
+                                                    <div class="motorista-footer">
+
+                                                        <a href="/motorista/editar/<%= motorista.id %>"
+                                                            class="btn btn-editar">
+
+                                                            <i class="bi bi-pencil"></i>
+
+                                                            Editar
+
+                                                        </a>
+
+
+                                                        <form class="form-excluir"
+                                                            action="/motorista/excluir/<%= motorista.id %>"
+                                                            method="POST">
+
+                                                            <button type="submit" class="btn btn-excluir">
+
+                                                                <i class="bi bi-trash"></i>
+
+                                                                Excluir
+
+                                                            </button>
+
+                                                        </form>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <% }) %>
+
+                                        </div>
+
+                                        <% } else { %>
+
+                                            <!-- ESTADO VAZIO -->
+                                            <div class="empty-state">
+
+                                                <div class="empty-icon">
+
+                                                    <i class="bi bi-people"></i>
+
+                                                </div>
+
+                                                <h3>
+                                                    Nenhum motorista encontrado
+                                                </h3>
+
+                                                <p>
+                                                    Ainda não existem motoristas cadastrados no sistema.
+                                                </p>
+
+                                                <a href="/motorista/cadastrar" class="btn btn-novo">
+
+                                                    <i class="bi bi-person-plus"></i>
+
+                                                    Cadastrar motorista
+
+                                                </a>
+
+                                            </div>
+
+                                            <% } %>
+
+                        </div>
+
+                    </main>
+
+            </div>
+
+
+            <%- include('../../partials/scripts') %>
+
+
+                <!-- SWEETALERT -->
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+                <!-- EXCLUSÃO -->
+                <script>
+
+                    const formsExcluir =
+                        document.getElementsByClassName('form-excluir');
+
+                    for (const formExcluir of formsExcluir) {
+
+                        formExcluir.addEventListener('submit', (e) => {
+
+                            e.preventDefault();
+
+                            Swal.fire({
+
+                                title: 'Excluir motorista?',
+
+                                text: 'Essa ação não poderá ser desfeita.',
+
+                                icon: 'warning',
+
+                                showCancelButton: true,
+
+                                confirmButtonText: 'Sim, excluir',
+
+                                cancelButtonText: 'Cancelar',
+
+                                confirmButtonColor: '#8b2e2e',
+
+                                cancelButtonColor: '#6c757d',
+
+                                reverseButtons: true
+
+                            }).then((result) => {
+
+                                if (result.isConfirmed) {
+
+                                    formExcluir.submit();
+
+                                }
+
+                            });
+
+                        });
+
+                    }
+
+                </script>
+
+
+                <style>
+                    /* =========================================
+           ESTRUTURA
+        ========================================= */
+
+                    .content {
+
+                        min-height: calc(100vh - 60px);
+
+                    }
+
+
+                    /* =========================================
+           CABEÇALHO
+        ========================================= */
+
+                    .motorista-header {
+
+                        display: flex;
+
+                        justify-content: space-between;
+
+                        align-items: flex-end;
+
+                        gap: 20px;
+
+                    }
+
+
+                    .motorista-header h1 {
+
+                        margin: 0;
+
+                        color: #343a40;
+
+                        font-size: 28px;
+
+                        font-weight: 700;
+
+                    }
+
+
+                    .motorista-header p {
+
+                        margin: 6px 0 0;
+
+                        color: #6c757d;
+
+                    }
+
+
+                    .header-actions {
+
+                        display: flex;
+
+                        align-items: center;
+
+                        gap: 10px;
+
+                    }
+
+
+                    /* =========================================
+           BOTÃO NOVO
+        ========================================= */
+
+                    .btn-novo {
+
+                        background: #8b2e2e;
+
+                        border: 1px solid #8b2e2e;
+
+                        color: #fff;
+
+                        border-radius: 8px;
+
+                        padding: 10px 17px;
+
+                        font-weight: 600;
+
+                        display: inline-flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        gap: 8px;
+
+                        white-space: nowrap;
+
+                        transition: all .2s ease;
+
+                    }
+
+
+                    .btn-novo:hover {
+
+                        background: #7a1f1f;
+
+                        border-color: #7a1f1f;
+
+                        color: #fff;
+
+                        transform: translateY(-1px);
+
+                    }
+
+
+                    /* =========================================
+           BOTÃO VOLTAR
+        ========================================= */
+
+                    .btn-voltar {
+
+                        background: #fff;
+
+                        border: 1px solid #d9dde1;
+
+                        color: #495057;
+
+                        border-radius: 8px;
+
+                        padding: 10px 17px;
+
+                        font-weight: 600;
+
+                        display: inline-flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        gap: 8px;
+
+                        white-space: nowrap;
+
+                        transition: all .2s ease;
+
+                    }
+
+
+                    .btn-voltar:hover {
+
+                        background: #f5f6f7;
+
+                        border-color: #bfc4c9;
+
+                        color: #343a40;
+
+                        transform: translateY(-1px);
+
+                    }
+
+
+                    /* =========================================
+           ALERTA
+        ========================================= */
+
+                    .motorista-alert {
+
+                        border: none;
+
+                        border-radius: 10px;
+
+                        margin-bottom: 24px;
+
+                    }
+
+
+                    /* =========================================
+           GRID
+        ========================================= */
+
+                    .motoristas-grid {
+
+                        display: grid;
+
+                        grid-template-columns:
+                            repeat(auto-fill, minmax(330px, 1fr));
+
+                        gap: 20px;
+
+                    }
+
+
+                    /* =========================================
+           CARD
+        ========================================= */
+
+                    .motorista-card {
+
+                        background: #fff;
+
+                        border: 1px solid #e9ecef;
+
+                        border-radius: 14px;
+
+                        padding: 22px;
+
+                        transition: .2s ease;
+
+                    }
+
+
+                    .motorista-card:hover {
+
+                        transform: translateY(-3px);
+
+                        box-shadow:
+                            0 8px 25px rgba(0, 0, 0, .07);
+
+                        border-color: #ddd;
+
+                    }
+
+
+                    /* =========================================
+           PARTE SUPERIOR
+        ========================================= */
+
+                    .motorista-top {
+
+                        display: flex;
+
+                        justify-content: space-between;
+
+                        align-items: flex-start;
+
+                        gap: 12px;
+
+                    }
+
+
+                    .motorista-identidade {
+
+                        display: flex;
+
+                        align-items: center;
+
+                        gap: 13px;
+
+                        min-width: 0;
+
+                        flex: 1;
+
+                    }
+
+
+                    /* =========================================
+           FOTO DO USUÁRIO
+        ========================================= */
+
+                    .motorista-avatar {
+
+                        width: 58px;
+
+                        height: 58px;
+
+                        min-width: 58px;
+
+                        border-radius: 50%;
+
+                        overflow: hidden;
+
+                        background: #f3e4e4;
+
+                        color: #8b2e2e;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        font-size: 23px;
+
+                        border: 2px solid #ead1d1;
+
+                    }
+
+
+                    .motorista-foto {
+
+                        width: 100%;
+
+                        height: 100%;
+
+                        display: block;
+
+                        object-fit: cover;
+
+                    }
+
+
+                    .motorista-foto-fallback {
+
+                        width: 100%;
+
+                        height: 100%;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                    }
+
+
+                    .motorista-nome {
+
+                        min-width: 0;
+
+                    }
+
+
+                    .motorista-identidade h3 {
+
+                        margin: 0;
+
+                        font-size: 17px;
+
+                        font-weight: 700;
+
+                        color: #343a40;
+
+                        white-space: nowrap;
+
+                        overflow: hidden;
+
+                        text-overflow: ellipsis;
+
+                    }
+
+
+                    .motorista-identidade span {
+
+                        display: block;
+
+                        margin-top: 3px;
+
+                        font-size: 12px;
+
+                        color: #8a8f94;
+
+                    }
+
+
+                    /* =========================================
+           STATUS
+        ========================================= */
+
+                    .status {
+
+                        display: inline-flex;
+
+                        align-items: center;
+
+                        gap: 6px;
+
+                        padding: 5px 9px;
+
+                        border-radius: 20px;
+
+                        font-size: 12px;
+
+                        font-weight: 600;
+
+                        white-space: nowrap;
+
+                    }
+
+
+                    .status span {
+
+                        width: 6px;
+
+                        height: 6px;
+
+                        border-radius: 50%;
+
+                    }
+
+
+                    .status.ativo {
+
+                        color: #287a48;
+
+                        background: #edf8f1;
+
+                    }
+
+
+                    .status.ativo span {
+
+                        background: #35a862;
+
+                    }
+
+
+                    .status.inativo {
+
+                        color: #6c757d;
+
+                        background: #f1f2f3;
+
+                    }
+
+
+                    .status.inativo span {
+
+                        background: #8c9399;
+
+                    }
+
+
+                    /* =========================================
+           INFORMAÇÕES
+        ========================================= */
+
+                    .motorista-info {
+
+                        margin-top: 22px;
+
+                        padding-top: 18px;
+
+                        border-top: 1px solid #f0f0f0;
+
+                        display: flex;
+
+                        flex-direction: column;
+
+                        gap: 14px;
+
+                    }
+
+
+                    .info-item {
+
+                        display: flex;
+
+                        align-items: center;
+
+                        gap: 11px;
+
+                    }
+
+
+                    .info-icon {
+
+                        width: 34px;
+
+                        height: 34px;
+
+                        flex-shrink: 0;
+
+                        border-radius: 8px;
+
+                        background: #f7f7f7;
+
+                        color: #8b2e2e;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                    }
+
+
+                    .info-item small {
+
+                        display: block;
+
+                        font-size: 11px;
+
+                        color: #999;
+
+                        margin-bottom: 2px;
+
+                    }
+
+
+                    .info-item p {
+
+                        margin: 0;
+
+                        font-size: 13px;
+
+                        color: #454545;
+
+                        word-break: break-word;
+
+                    }
+
+
+                    /* =========================================
+           RODAPÉ / AÇÕES
+        ========================================= */
+
+                    .motorista-footer {
+
+                        display: flex;
+
+                        gap: 10px;
+
+                        margin-top: 20px;
+
+                        padding-top: 17px;
+
+                        border-top: 1px solid #f0f0f0;
+
+                    }
+
+
+                    .motorista-footer form {
+
+                        flex: 1;
+
+                        margin: 0;
+
+                        display: flex;
+
+                    }
+
+
+                    .motorista-footer .btn {
+
+                        width: 100%;
+
+                        min-height: 38px;
+
+                        border-radius: 8px;
+
+                        font-size: 13px;
+
+                        font-weight: 600;
+
+                        padding: 8px 13px;
+
+                        display: inline-flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        gap: 6px;
+
+                        transition: all .2s ease;
+
+                    }
+
+
+                    /* =========================================
+           EDITAR
+        ========================================= */
+
+                    .btn-editar {
+
+                        flex: 1;
+
+                        background: #fff;
+
+                        border: 1px solid #adb5bd;
+
+                        color: #495057;
+
+                    }
+
+
+                    .btn-editar:hover {
+
+                        background: #f5f6f7;
+
+                        border-color: #8f969d;
+
+                        color: #343a40;
+
+                        transform: translateY(-1px);
+
+                    }
+
+
+                    /* =========================================
+           EXCLUIR
+        ========================================= */
+
+                    .btn-excluir {
+
+                        background: #fff;
+
+                        border: 1px solid #b74c4c;
+
+                        color: #8b2e2e;
+
+                    }
+
+
+                    .btn-excluir:hover {
+
+                        background: #8b2e2e;
+
+                        border-color: #8b2e2e;
+
+                        color: #fff;
+
+                        transform: translateY(-1px);
+
+                    }
+
+
+                    /* =========================================
+           ESTADO VAZIO
+        ========================================= */
+
+                    .empty-state {
+
+                        background: #fff;
+
+                        border: 1px dashed #d8d8d8;
+
+                        border-radius: 14px;
+
+                        padding: 60px 20px;
+
+                        text-align: center;
+
+                    }
+
+
+                    .empty-icon {
+
+                        width: 58px;
+
+                        height: 58px;
+
+                        margin: 0 auto 18px;
+
+                        border-radius: 12px;
+
+                        background: #f3e4e4;
+
+                        color: #8b2e2e;
+
+                        display: flex;
+
+                        align-items: center;
+
+                        justify-content: center;
+
+                        font-size: 25px;
+
+                    }
+
+
+                    .empty-state h3 {
+
+                        font-size: 18px;
+
+                        color: #343a40;
+
+                        margin-bottom: 7px;
+
+                    }
+
+
+                    .empty-state p {
+
+                        color: #888;
+
+                        font-size: 14px;
+
+                        margin-bottom: 20px;
+
+                    }
+
+
+                    /* =========================================
+           TABLET
+        ========================================= */
+
+                    @media (max-width: 768px) {
+
+                        .motorista-header {
+
+                            align-items: flex-start;
+
+                            flex-direction: column;
+
+                        }
+
+
+                        .header-actions {
+
+                            width: 100%;
+
+                            flex-direction: row;
+
+                        }
+
+
+                        .header-actions .btn {
+
+                            flex: 1;
+
+                        }
+
+
+                        .motoristas-grid {
+
+                            grid-template-columns: 1fr;
+
+                        }
+
+                    }
+
+
+                    /* =========================================
+           CELULAR
+        ========================================= */
+
+                    @media (max-width: 480px) {
+
+                        .motorista-header h1 {
+
+                            font-size: 24px;
+
+                        }
+
+
+                        .header-actions {
+
+                            flex-direction: column;
+
+                            width: 100%;
+
+                        }
+
+
+                        .header-actions .btn {
+
+                            width: 100%;
+
+                            flex: none;
+
+                        }
+
+
+                        .motorista-card {
+
+                            padding: 18px;
+
+                        }
+
+
+                        .motorista-top {
+
+                            align-items: center;
+
+                        }
+
+
+                        .motorista-avatar {
+
+                            width: 50px;
+
+                            height: 50px;
+
+                            min-width: 50px;
+
+                        }
+
+
+                        .motorista-identidade h3 {
+
+                            max-width: 150px;
+
+                        }
+
+
+                        .motorista-footer {
+
+                            flex-direction: column;
+
+                        }
+
+
+                        .motorista-footer .btn,
+
+                        .motorista-footer form {
+
+                            width: 100%;
+
+                            flex: none;
+
+                        }
+
+                    }
+                </style>
+
+    </body>
+
+</html>
